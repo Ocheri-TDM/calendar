@@ -1,0 +1,439 @@
+{% extends 'admin/admin-header.html' %}
+{% load static %}
+{% block title %}  Управление учителями  {% endblock %}
+{% block content %}
+    <link rel="stylesheet" href="{% static 'css/admin/admin-teacher.css' %}">
+    <link rel="stylesheet" href="{% static 'css/append.css' %}">
+
+    
+    <!-- Контейнер приложения -->
+    <div class="app-container">
+        <!-- Боковое меню -->
+        <nav class="admin-sidebar">
+            <a href="{% url 'admin-schedule' %}" class="nav-item">
+                <i class="fas fa-table"></i>
+                Расписание занятий
+            </a>
+            <a href="{% url 'admin-group' %}" class="nav-item">
+                <i class="fas fa-users "></i>
+                Управление группами
+            </a>
+            <a href="{% url 'admin-discipline' %}" class="nav-item">
+                <i class="fas fa-book"></i>
+                Управление предметами
+            </a>
+            <a href="{% url 'admin-teacher' %}" class="nav-item active">
+                <i class="fas fa-chalkboard-teacher"></i>
+                Управление преподавателями
+            </a>
+            <a href="{% url 'admin-cab' %}" class="nav-item">
+                <i class="fas fa-door-open"></i>
+                Управление аудиториями
+            </a>
+            <div class="nav-divider"></div>
+            <div class="nav-item">
+                <i class="fas fa-cog"></i>
+                Настройки системы
+            </div>
+            <div class="nav-item">
+                <i class="fas fa-sign-out-alt"></i>
+                Выход
+            </div>
+        </nav>
+        
+        <!-- Основной контент -->
+        <main class="main-content">
+            <!-- Шапка страницы -->
+            <div class="page-header">
+                <div class="page-title">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                    <h2>Управление преподавательским составом</h2>
+                </div>
+                <div class="actions-group">
+                    <button class="toolbar-btn btn-main">
+                        <i class="fas fa-plus-circle"></i> Добавить преподавателя
+                    </button>
+                </div>
+            </div>
+
+            <!-- Карточки преподавателей -->
+            <div class="teachers-grid">
+            {% for teacher in teachers %}
+
+
+                <div class="teacher-card"
+                    data-id="{{ teacher.id }}"
+                    data-first-name="{{ teacher.first_name }}"
+                    data-last-name="{{ teacher.last_name }}"
+                    data-patronymic="{{ teacher.patronymic|default:'' }}"
+                    data-phone="{{ teacher.phone_number }}"
+                    data-gmail="{{ teacher.gmail|default:'' }}"
+                    data-position="{{ teacher.position|default:'' }}"
+                    data-photo="{% if teacher.photo %}{{ teacher.photo.url }}{% endif %}">
+
+
+                    <div class="card-header">
+                        <div class="teacher-avatar">
+                            {% if teacher.photo %}
+                                <img src="{{ teacher.photo.url }}" alt="Фото {{ teacher }}">
+                            {% else %}
+                                <i class="fas fa-user"></i>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <div class="teacher-name">{{ teacher.last_name }} {{ teacher.first_name }} {{ teacher.patronymic }}</div>
+                            <div class="teacher-position">{{ teacher.position|default:"—" }}</div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="teacher-meta">
+                            <div class="meta-item">
+                                <div class="meta-icon"><i class="fas fa-envelope"></i></div>
+                                <div class="meta-content">{{ teacher.gmail|default:"не указан" }}</div>
+                            </div>
+                            <div class="meta-item">
+                                <div class="meta-icon"><i class="fas fa-phone"></i></div>
+                                <div class="meta-content">{{ teacher.phone_number }}</div>
+                            </div>
+                        </div>
+
+                        <div class="teacher-stats">
+                            <div class="stat-box">
+                                <div class="stat-value">{{ teacher.disciplines.count }}</div>
+                                <div class="stat-label">предметов</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-value">
+                                    1
+                                </div>
+                                <div class="stat-label">часов в неделю</div>
+                            </div>
+                        </div>
+
+                        <div class="meta-item">
+                            <div class="meta-icon"><i class="fas fa-book"></i></div>
+                            <div class="meta-content">
+                                <strong>Предметы:</strong>
+                                {% for d in teacher.disciplines.all %}
+                                    {{ d.name_dis }}{% if not forloop.last %}, {% endif %}
+                                {% empty %}
+                                    Нет предметов
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <button class="card-btn edit-btn edit-teacher-btn" data-id="{{ teacher.id }}">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="card-btn delete-btn" data-id="{{ teacher.id }}">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </div>
+                </div>
+                {% empty %}
+                <p>Преподаватели не найдены.</p>
+                {% endfor %}
+            </div>
+        </main>
+    </div>
+
+
+<!-- Модальное окно добавления преподавателя -->
+<div class="modal-overlay" id="teacher-modal-add">
+    <div class="modal-content">
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="modal-header">
+                <h3 class="modal-title">Добавить преподавателя</h3>
+                <button type="button" class="close-btn">&times;</button>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Фамилия</label>
+                <input type="text" name="last_name" class="form-input" placeholder="Например: Иванов" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Имя</label>
+                <input type="text" name="first_name" class="form-input" placeholder="Например: Александр" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Отчество</label>
+                <input type="text" name="patronymic" class="form-input" placeholder="Например: Сергеевич">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Телефон</label>
+                <input type="text" name="phone_number" class="form-input" placeholder="+7 (___) ___-__-__">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Email</label>
+                <input type="email" name="email" class="form-input" placeholder="ivanov@college.edu">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Должность</label>
+                <input type="text" name="position" class="form-input" placeholder="Профессор, Доцент и т.д.">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Фотография преподавателя</label>
+                <div class="avatar-upload">
+                    <div class="avatar-preview" id="avatarPreview">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <label class="upload-btn">
+                        Загрузить фото
+                        <input type="file" name="avatar" accept="image/*" hidden id="avatarInput">
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-footer">
+                <button type="button" class="form-btn btn-cancel">Отмена</button>
+                <button type="submit" class="form-btn btn-save">Сохранить преподавателя</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Модальное окно редактирования преподавателя -->
+<div class="modal-overlay" id="teacher-modal-edit">
+    <div class="modal-content">
+        <form method="POST" enctype="multipart/form-data" id="editTeacherForm">
+            {% csrf_token %}
+            <input type="hidden" name="teacher_id" id="editTeacherId">
+
+            <div class="modal-header">
+                <h3 class="modal-title">Редактировать преподавателя</h3>
+                <button type="button" class="close-btn">&times;</button>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Фамилия</label>
+                <input type="text" name="last_name" id="editLastName" class="form-input" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Имя</label>
+                <input type="text" name="first_name" id="editFirstName" class="form-input" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Отчество</label>
+                <input type="text" name="patronymic" id="editPatronymic" class="form-input">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Телефон</label>
+                <input type="text" name="phone_number" id="editPhone" class="form-input">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Gmail</label>
+                <input type="email" name="gmail" id="editGmail" class="form-input">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Должность</label>
+                <input type="text" name="position" id="editPosition" class="form-input">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Фотография</label>
+                <div class="avatar-upload">
+                    <div class="avatar-preview" id="editAvatarPreview">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <label class="upload-btn">
+                        Загрузить фото
+                        <input type="file" name="photo" accept="image/*" hidden id="editAvatarInput">
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-footer">
+                <button type="button" class="form-btn btn-cancel">Отмена</button>
+                <button type="submit" class="form-btn btn-save">Сохранить изменения</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Модальное окно удаления преподавателя -->
+<div class="modal-overlay" id="delete-teacher-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">Удалить преподавателя</h3>
+            <button type="button" class="close-btn">&times;</button>
+        </div>
+        <p>Вы уверены, что хотите удалить этого преподавателя?</p>
+
+        <div class="form-footer">
+            <button type="button" class="form-btn btn-cancel" id="cancelDelete">Отмена</button>
+            <button type="button" class="form-btn btn-save" id="confirmDelete">Удалить</button>
+        </div>
+    </div>
+</div>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    // Кнопки открытия модалок
+    const openTeacherModalBtn = document.querySelector(".btn-main"); // кнопка "Добавить преподавателя"
+    const teacherModal = document.getElementById("teacher-modal-add");
+
+    // Универсальное открытие
+    if (openTeacherModalBtn && teacherModal) {
+        openTeacherModalBtn.addEventListener("click", () => {
+            teacherModal.classList.add("active");
+        });
+    }
+
+    // Закрытие модалок по кнопке "×" и "Отмена"
+    document.querySelectorAll(".modal-overlay").forEach(modal => {
+        modal.querySelectorAll(".close-btn, .btn-cancel").forEach(btn => {
+            btn.addEventListener("click", () => {
+                modal.classList.remove("active");
+            });
+        });
+    });
+
+    // Закрытие кликом на фон
+    document.querySelectorAll(".modal-overlay").forEach(modal => {
+        modal.addEventListener("click", (e) => {
+            if (e.target === modal) {
+                modal.classList.remove("active");
+            }
+        });
+    });
+});
+
+// Предпросмотр аватара
+document.getElementById("avatarInput").addEventListener("change", function () {
+        const file = this.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const preview = document.getElementById("avatarPreview");
+                preview.innerHTML = `<img src="${e.target.result}" alt="Avatar">`;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+</script>
+
+<!-- Модалка редактирования преподавателя -->
+<script>
+ document.querySelectorAll(".edit-teacher-btn").forEach(btn => {
+    btn.addEventListener("click", function () {
+        const teacherCard = this.closest(".teacher-card");
+
+        // Берем данные из data-атрибутов
+        const teacherId = teacherCard.dataset.id;
+        const lastName = teacherCard.dataset.lastName;
+        const firstName = teacherCard.dataset.firstName;
+        const patronymic = teacherCard.dataset.patronymic;
+        const gmail = teacherCard.dataset.gmail;
+        const phone = teacherCard.dataset.phone;
+        const position = teacherCard.dataset.position;
+        const photoUrl = teacherCard.dataset.photo;
+
+        // Заполняем форму
+        document.getElementById("editTeacherId").value = teacherId;
+        document.getElementById("editLastName").value = lastName;
+        document.getElementById("editFirstName").value = firstName;
+        document.getElementById("editPatronymic").value = patronymic;
+        document.getElementById("editGmail").value = gmail;
+        document.getElementById("editPhone").value = phone;
+        document.getElementById("editPosition").value = position;
+
+        // Фото: если есть -> вставляем, если нет -> иконку
+        const preview = document.getElementById("editAvatarPreview");
+        if (photoUrl) {
+            preview.innerHTML = `<img src="${photoUrl}" alt="Фото">`;
+        } else {
+            preview.innerHTML = `<i class="fas fa-user"></i>`;
+        }
+
+        // Открываем модалку
+        document.getElementById("teacher-modal-edit").classList.add("active");
+    });
+});
+
+// Предпросмотр нового фото в форме редактирования
+document.getElementById("editAvatarInput").addEventListener("change", function (e) {
+    const file = e.target.files[0];
+    const preview = document.getElementById("editAvatarPreview");
+
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            preview.innerHTML = `<img src="${e.target.result}" alt="Фото">`;
+        }
+        reader.readAsDataURL(file);
+    } else {
+        preview.innerHTML = `<i class="fas fa-user"></i>`;
+    }
+});
+</script>
+
+<!-- Модальное окно удаления преподавателя -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const deleteButtons = document.querySelectorAll('.delete-btn');
+    const deleteModal = document.getElementById('delete-teacher-modal');
+    const cancelDelete = document.getElementById('cancelDelete');
+    const confirmDelete = document.getElementById('confirmDelete');
+    const closeDelete = deleteModal.querySelector('.close-btn');
+
+    let teacherId = null;
+
+    // Открытие модалки
+    deleteButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            teacherId = btn.getAttribute('data-id');
+            deleteModal.classList.add('active');
+        });
+    });
+
+    // Закрытие
+    [cancelDelete, closeDelete].forEach(el => {
+        el.addEventListener('click', () => {
+            deleteModal.classList.remove('active');
+            teacherId = null;
+        });
+    });
+
+    // Подтверждение удаления
+    confirmDelete.addEventListener('click', () => {
+        if (!teacherId) return;
+
+        fetch(`/delete-teacher/${teacherId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCSRFToken(),
+            }
+        })
+        .then(res => {
+            if (res.ok) {
+                document.querySelector(`[data-id="${teacherId}"]`).closest('.teacher-card').remove();
+                deleteModal.classList.remove('active');
+            } else {
+                alert('Ошибка при удалении');
+            }
+        });
+    });
+
+    // Получение CSRF токена
+    function getCSRFToken() {
+        const cookieValue = document.cookie.split('; ').find(row => row.startsWith('csrftoken='));
+        return cookieValue ? cookieValue.split('=')[1] : '';
+    }
+});
+</script>
+
+{% endblock %}                            

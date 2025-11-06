@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="filename" content="subjects_management.html">
+    <title>Управление предметами - Колледж ИТ</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="../css/header.css">
+    <link rel="stylesheet" href="../css/admin/admin-discipline.css">
+    <link rel="stylesheet" href="../css/append.css">
+</head>
+<body>
+    <!-- Шапка -->
+    <header class="admin-header">
+        <div class="logo">
+            <i class="fas fa-calendar-alt"></i>
+            <h1>Управление предметами</h1>
+        </div>
+        <div class="admin-controls">
+            <div class="notification-btn">
+                <i class="fas fa-bell"></i>
+                <div class="notification-badge">3</div>
+            </div>
+            <div class="admin-user">
+                <div class="user-avatar">АД</div>
+                <div class="user-info">
+                    <div class="user-name">Администратор</div>
+                    <div class="user-role">Администратор</div>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Контейнер приложения -->
+    <div class="app-container">
+        <!-- Боковое меню -->
+        <nav class="admin-sidebar">
+            <a href="admin-schedule-main.html" class="nav-item">
+                <i class="fas fa-table"></i>
+                Расписание занятий
+            </a>
+            <a href="admin-group.html" class="nav-item">
+                <i class="fas fa-users "></i>
+                Управление группами
+            </a>
+            <a href="admin-discipline.html" class="nav-item active">
+                <i class="fas fa-book"></i>
+                Управление предметами
+            </a>
+            <a href="admin-teacher.html" class="nav-item">
+                <i class="fas fa-chalkboard-teacher"></i>
+                Управление преподавателями
+            </a>
+            <a href="admin-cab.html" class="nav-item">
+                <i class="fas fa-door-open"></i>
+                Управление аудиториями
+            </a>
+            <div class="nav-divider"></div>
+            <div class="nav-item">
+                <i class="fas fa-cog"></i>
+                Настройки системы
+            </div>
+            <div class="nav-item">
+                <i class="fas fa-sign-out-alt"></i>
+                Выход
+            </div>
+        </nav>
+        
+        <!-- Основной контент -->
+        <main class="main-content">
+            <!-- Шапка страницы -->
+            <div class="page-header">
+                <div class="page-title">
+                    <i class="fas fa-book"></i>
+                    <h2>Управление учебными предметами</h2>
+                </div>
+                <div class="actions-group">
+                    <button id="add-subject-btn" class="toolbar-btn btn-main">
+                        <i class="fas fa-plus-circle"></i> Добавить предмет
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Статистика -->
+            <div class="stats-container">
+                <div class="stat-card">
+                    <div class="filter-icon">
+                        <i class="fas fa-book-open"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>84</h3>
+                        <p>Всего предметов</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="filter-icon-2">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>72</h3>
+                        <p>Активные предметы</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="filter-icon-3">
+                        <i class="fas fa-history"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>12</h3>
+                        <p>Неактивные</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Поисковая панель -->
+            <div class="search-section">
+                <div class="search-group">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" class="search-input" placeholder="Поиск по названию, коду...">
+                </div>
+                <div class="filter-group">
+                    <select class="form-select">
+                        <option>Все дисциплины</option>
+                        <option>Общеобразовательные</option>
+                        <option>Профильные</option>
+                        <option>Спецкурсы</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- Таблица предметов -->
+            <div class="subjects-table-container">
+                <table class="subjects-table">
+                    <thead>
+                        <tr>
+                            <th width="80">ID</th>
+                            <th>Название предмета</th>
+                            <th>Кафедра</th>
+                            <th width="120">Часов</th>
+                            <th width="120">Форма контроля</th>
+                            <th width="120">Статус</th>
+                            <th width="140">Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="subject-id">#S001</td>
+                            <td>
+                                <div class="subject-name">
+                                    <i class="fas fa-laptop-code"></i>
+                                    <div>
+                                        Основы программирования
+                                        <div class="subject-shortcode">ОПРОГ</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="subject-details">Информатика и ПО</td>
+                            <td>144</td>
+                            <td><span class="badge badge-warning">Экзамен</span></td>
+                            <td><span class="badge badge-success">Активен</span></td>
+                            <td class="actions-cell">
+                                <button class="action-btn edit-btn edit-subject-btn">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="action-btn delete-btn">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="subject-id">#S002</td>
+                            <td>
+                                <div class="subject-name">
+                                    <i class="fas fa-database"></i>
+                                    <div>
+                                        Базы данных
+                                        <div class="subject-shortcode">БД</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="subject-details">Информатика и ПО</td>
+                            <td>120</td>
+                            <td><span class="badge badge-warning">Экзамен</span></td>
+                            <td><span class="badge badge-success">Активен</span></td>
+                            <td class="actions-cell">
+                                <button class="action-btn edit-btn edit-subject-btn">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="action-btn delete-btn">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="subject-id">#S003</td>
+                            <td>
+                                <div class="subject-name">
+                                    <i class="fas fa-network-wired"></i>
+                                    <div>
+                                        Компьютерные сети
+                                        <div class="subject-shortcode">КС</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="subject-details">Информационные системы</td>
+                            <td>96</td>
+                            <td><span class="badge badge-primary">Зачёт</span></td>
+                            <td><span class="badge badge-success">Активен</span></td>
+                            <td class="actions-cell">
+                                <button class="action-btn edit-btn edit-subject-btn">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="action-btn delete-btn">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="subject-id">#S004</td>
+                            <td>
+                                <div class="subject-name">
+                                    <i class="fas fa-shield-alt"></i>
+                                    <div>
+                                        Кибербезопасность
+                                        <div class="subject-shortcode">КИБЕР</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="subject-details">Информационная безопасность</td>
+                            <td>108</td>
+                            <td><span class="badge badge-warning">Экзамен</span></td>
+                            <td><span class="badge badge-success">Активен</span></td>
+                            <td class="actions-cell">
+                                <button class="action-btn edit-btn edit-subject-btn">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="action-btn delete-btn">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="subject-id">#S005</td>
+                            <td>
+                                <div class="subject-name">
+                                    <i class="fas fa-globe"></i>
+                                    <div>
+                                        Веб-разработка
+                                        <div class="subject-shortcode">ВЕБ</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="subject-details">Интернет-технологии</td>
+                            <td>132</td>
+                            <td><span class="badge badge-warning">Экзамен</span></td>
+                            <td><span class="badge badge-success">Активен</span></td>
+                            <td class="actions-cell">
+                                <button class="action-btn edit-btn edit-subject-btn">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="action-btn delete-btn">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="subject-id">#S006</td>
+                            <td>
+                                <div class="subject-name">
+                                    <i class="fas fa-calculator"></i>
+                                    <div>
+                                        Математический анализ
+                                        <div class="subject-shortcode">МАТАН</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="subject-details">Общая математика</td>
+                            <td>180</td>
+                            <td><span class="badge badge-warning">Экзамен</span></td>
+                            <td><span class="badge badge-success">Активен</span></td>
+                            <td class="actions-cell">
+                                <button class="action-btn edit-btn edit-subject-btn">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="action-btn delete-btn">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Пагинация -->
+            <div class="pagination">
+                <button><i class="fas fa-chevron-left"></i></button>
+                <button class="active">1</button>
+                <button>2</button>
+                <button>3</button>
+                <button><i class="fas fa-chevron-right"></i></button>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Модальное окно добавления/редактирования предмета -->
+    <div class="modal-overlay" id="subject-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Добавить новый предмет</h3>
+                <button class="close-btn" id="close-modal">&times;</button>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Название предмета</label>
+                <input type="text" class="form-input" placeholder="Например: Алгоритмы и структуры данных">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Короткий код</label>
+                <input type="text" class="form-input" placeholder="Например: АИСД">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Описание предмета</label>
+                <textarea class="form-textarea" placeholder="Краткое описание курса..."></textarea>
+            </div>
+            <div class="form-columns">
+                <div class="form-group">
+                    <label class="form-label">Количество часов</label>
+                    <input type="number" class="form-input" value="96" min="0">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Преподаватель</label>
+                    <select class="form-select">
+                        <option>Не назначен</option>
+                        <option>Иванов А.С.</option>
+                        <option selected>Николаева Т.П.</option>
+                        <option>Петров Е.Н.</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-columns">
+                <div class="form-group">
+                    <label class="form-label">Кафедра</label>
+                    <select class="form-select">
+                        <option>Информатика и ПО</option>
+                        <option>Информационные системы</option>
+                        <option>Информационная безопасность</option>
+                        <option>Интернет-технологии</option>
+                        <option>Общая математика</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Форма контроля</label>
+                    <select class="form-select">
+                        <option>Экзамен</option>
+                        <option>Зачёт</option>
+                        <option>Курсовая работа</option>
+                        <option>Дифференцированный зачёт</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Статус предмета</label>
+                <div style="display: flex; gap: 15px;">
+                    <label style="display: flex; align-items: center; gap: 8px;">
+                        <input type="radio" name="status" value="active" checked>
+                        Активен
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px;">
+                        <input type="radio" name="status" value="inactive">
+                        Неактивен
+                    </label>
+                </div>
+            </div>
+            <div class="form-footer">
+                <button class="form-btn btn-cancel" id="cancel-btn">Отмена</button>
+                <button class="form-btn btn-save">Сохранить предмет</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Управление модальным окном
+        const addSubjectBtn = document.getElementById('add-subject-btn');
+        const modal = document.getElementById('subject-modal');
+        const closeButtons = document.querySelectorAll('.close-btn, .btn-cancel');
+        const editButtons = document.querySelectorAll('.edit-subject-btn');
+        const modalTitle = document.querySelector('.modal-title');
+        
+        addSubjectBtn.addEventListener('click', () => {
+            modalTitle.textContent = "Добавить новый предмет";
+            modal.classList.add('active');
+        });
+        
+        editButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                modalTitle.textContent = "Редактировать предмет";
+                modal.classList.add('active');
+            });
+        });
+        
+        closeButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                modal.classList.remove('active');
+            });
+        });
+        
+        // График распределения предметов по кафедрам
+        const ctx = document.getElementById('subjects-chart').getContext('2d');
+        const subjectsChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Информатика и ПО', 'Информационные системы', 'Информационная безопасность', 'Интернет-технологии', 'Общая математика'],
+                datasets: [{
+                    label: 'Количество часов',
+                    data: [420, 380, 320, 280, 240],
+                    backgroundColor: [
+                        'rgba(41, 128, 185, 0.7)',
+                        'rgba(52, 152, 219, 0.7)',
+                        'rgba(61, 142, 201, 0.7)',
+                        'rgba(70, 162, 217, 0.7)',
+                        'rgba(88, 182, 227, 0.7)'
+                    ],
+                    borderColor: [
+                        'rgba(41, 128, 185, 1)',
+                        'rgba(52, 152, 219, 1)',
+                        'rgba(61, 142, 201, 1)',
+                        'rgba(70, 162, 217, 1)',
+                        'rgba(88, 182, 227, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    title: {
+                        display: true,
+                        text: 'Распределение часов по кафедрам',
+                        font: {
+                            size: 16
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Количество часов'
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Закрытие модального окна при клике вне его
+        window.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.remove('active');
+            }
+        });
+    </script>
+</body>

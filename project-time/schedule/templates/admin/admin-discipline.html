@@ -1,0 +1,498 @@
+{% extends 'admin/admin-header.html' %}
+{% load static %}
+{% block title %}  Управление учителями  {% endblock %}
+{% block content %}
+    <link rel="stylesheet" href="{% static 'css/admin/admin-discipline.css' %}">
+    <link rel="stylesheet" href="{% static 'css/append.css' %}">
+
+    
+    <!-- Контейнер приложения -->
+    <div class="app-container">
+        <!-- Боковое меню -->
+        <nav class="admin-sidebar">
+            <a href="{% url 'admin-schedule' %}" class="nav-item ">
+                <i class="fas fa-table"></i>
+                Расписание занятий
+            </a>
+            <a href="{% url 'admin-group' %}" class="nav-item">
+                <i class="fas fa-users "></i>
+                Управление группами
+            </a>
+            <a href="{% url 'admin-discipline' %}" class="nav-item active">
+                <i class="fas fa-book"></i>
+                Управление предметами
+            </a>
+            <a href="{% url 'admin-teacher' %}" class="nav-item">
+                <i class="fas fa-chalkboard-teacher"></i>
+                Управление преподавателями
+            </a>
+            <a href="{% url 'admin-cab' %}" class="nav-item">
+                <i class="fas fa-door-open"></i>
+                Управление аудиториями
+            </a>
+            <div class="nav-divider"></div>
+            <div class="nav-item">
+                <i class="fas fa-cog"></i>
+                Настройки системы
+            </div>
+            <div class="nav-item">
+                <i class="fas fa-sign-out-alt"></i>
+                Выход
+            </div>
+        </nav>
+        
+        <!-- Основной контент -->
+        <main class="main-content">
+            <!-- Шапка страницы -->
+            <div class="page-header">
+                <div class="page-title">
+                    <i class="fas fa-book"></i>
+                    <h2>Управление учебными предметами</h2>
+                </div>
+                <div class="actions-group">
+                    <button id="add-subject-btn" class="toolbar-btn btn-main">
+                        <i class="fas fa-plus-circle"></i> Добавить предмет
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Статистика -->
+            <div class="stats-container">
+                <div class="stat-card">
+                    <div class="filter-icon">
+                        <i class="fas fa-book-open"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>{{ total_count }}</h3>
+                        <p>Всего предметов</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="filter-icon-2">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>{{ active_count }}</h3>
+                        <p>Активные предметы</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="filter-icon-3">
+                        <i class="fas fa-history"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>{{ inactive_count }}</h3>
+                        <p>Неактивные</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Поисковая панель -->
+            <div class="search-section">
+                <div class="search-group">
+                    <i class="fas fa-search search-icon"></i>
+                    <input 
+                        type="text" 
+                        id="search-discipline" 
+                        class="search-input" 
+                        placeholder="Поиск по названию, коду, аудитории..."
+                        value="{{ search_query|default:'' }}">
+                </div>
+            </div>
+            
+            <!-- Таблица предметов -->
+            <div class="subjects-table-container">
+                <table class="subjects-table">
+                    <thead>
+                        <tr>
+                            <th width="300">Название предмета</th>
+                            <th>Кафедра</th>
+                            <th width="120">Часов</th>
+                            <th width="120">Форма контроля</th>
+                            <th width="180">Статус</th>
+                            <th width="140">Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody id="discipline-table-body">
+                            {% include 'dinamic/discipline-table.html' %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Пагинация -->
+            <div class="pagination" id="pagination">
+                {% include 'dinamic/paginator.html' %}
+            </div>
+        </main>
+    </div>
+    
+    <!-- Модальное окно добавления предмета -->
+<div class="modal-overlay" id="subject-modal">
+    <div class="modal-content">
+        <form method="post">
+            {% csrf_token %}
+            <div class="modal-header">
+                <h3 class="modal-title">Добавить новый предмет</h3>
+                <button class="close-btn" id="close-modal">&times;</button>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Название предмета</label>
+                <input type="text" name="name_dis" class="form-input" placeholder="Например: Алгоритмы и структуры данных" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Короткий код</label>
+                <input type="text" name="name_short" class="form-input" placeholder="Например: АИСД">
+            </div>
+
+            
+
+            <div class="form-group">
+                <label class="form-label">Преподаватели</label>
+
+                <div class="search-section-2">
+                    <div class="search-group">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" id="teacher-search" class="search-input" placeholder="(Например: Маркус Наталья)">
+                    </div>
+                </div>
+
+                <div class="teacher-list" id="teacher-list">
+                    {% for t in teachers %}
+                    <label class="teacher-item">
+                        <input type="checkbox" name="teachers" value="{{ t.id }}">
+                        <span>{{ t.last_name }} {{ t.first_name }} {{ t.patronymic|default:'' }}</span>
+                    </label>
+                    {% endfor %}
+                </div>
+
+                <small style="font-size: 0.85rem; color: gray;">Выберите нужных преподавателей (можно несколько)</small>
+            </div>
+
+            <div class="form-columns">
+                <div class="form-group">
+                    <label class="form-label">Количество часов</label>
+                    <input type="number" name="duration_hours" class="form-input" value="96" min="0">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Статус предмета</label>
+                    <div style="display: flex; gap: 15px;">
+                        <label style="display: flex; align-items: center; gap: 8px;">
+                            <input type="radio" name="status" value="active" checked>
+                            Активен
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px;">
+                            <input type="radio" name="status" value="inactive">
+                            Неактивен
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-columns">
+                <div class="form-group">
+                    <label class="form-label">Аудитория</label>
+                    <select name="classroom" class="form-select">
+                        <option value="">Не выбрано</option>
+                        {% for room in classrooms %}
+                            <option value="{{ room.id }}">{{ room.number_room }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Форма контроля</label>
+                    <select name="control_type" class="form-select">
+                        {% for val, label in CONTROL_CHOICES %}
+                            <option value="{{ val }}">{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-footer">
+                <button type="button" class="form-btn btn-cancel" id="cancel-btn">Отмена</button>
+                <button type="submit" class="form-btn btn-save">Сохранить предмет</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<!-- МОДАЛКА ДЛЯ РЕДАКТИРОВАНИЯ ПРЕДМЕТА -->
+<div class="modal-overlay" id="edit-subject-modal">
+    <div class="modal-content">
+        <form method="post" id="edit-subject-form">
+            {% csrf_token %}
+            <input type="hidden" name="discipline_id" id="edit-discipline-id">
+
+            <div class="modal-header">
+                <h3 class="modal-title">Редактировать предмет</h3>
+                <button type="button" class="close-btn" id="close-edit-modal">&times;</button>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Название предмета</label>
+                <input type="text" name="name_dis" id="edit-name_dis" class="form-input" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Короткий код</label>
+                <input type="text" name="name_short" id="edit-short_code" class="form-input">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Преподаватели</label>
+                <div class="search-section-2">
+                    <div class="search-group">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" id="edit-teacher-search" class="search-input" placeholder="(Например: Маркус Наталья)">
+                    </div>
+                </div>
+
+                <div class="teacher-list" id="edit-teacher-list">
+                    {% for t in teachers %}
+                    <label class="teacher-item">
+                        <input type="checkbox" name="teachers" value="{{ t.id }}">
+                        <span>{{ t.last_name }} {{ t.first_name }} {{ t.patronymic|default:'' }}</span>
+                    </label>
+                    {% endfor %}
+                </div>
+                <small style="font-size: 0.85rem; color: gray;">Выберите нужных преподавателей (можно несколько)</small>
+            </div>
+
+            <div class="form-columns">
+                <div class="form-group">
+                    <label class="form-label">Количество часов</label>
+                    <input type="number" name="duration_hours" id="edit-duration_hours" class="form-input" min="0">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Статус предмета</label>
+                    <div style="display: flex; gap: 15px;">
+                        <label style="display: flex; align-items: center; gap: 8px;">
+                            <input type="radio" name="status" value="active"> Активен
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px;">
+                            <input type="radio" name="status" value="inactive"> Неактивен
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-columns">
+                <div class="form-group">
+                    <label class="form-label">Аудитория</label>
+                    <select name="classroom" id="edit-classroom" class="form-select">
+                        <option value="">Не выбрано</option>
+                        {% for room in classrooms %}
+                        <option value="{{ room.id }}">{{ room.number_room }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Форма контроля</label>
+                    <select name="control_type" id="edit-control_type" class="form-select">
+                        {% for val, label in CONTROL_CHOICES %}
+                        <option value="{{ val }}">{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-footer">
+                <button type="button" class="form-btn btn-cancel" id="cancel-edit-btn">Отмена</button>
+                <button type="submit" class="form-btn btn-save">Сохранить изменения</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Модальное окно удаления предмета -->
+<div class="modal-overlay" id="delete-discipline-modal">
+    <div class="modal-content small">
+        <form method="post" id="delete-discipline-form">
+            {% csrf_token %}
+            <input type="hidden" name="delete_id" id="delete-discipline-id">
+
+            <div class="modal-header">
+                <h3 class="modal-title">Удалить предмет</h3>
+                <button type="button" class="close-btn" id="close-delete-modal">&times;</button>
+            </div>
+
+            <div class="modal-body">
+                <p style="font-size: 1.05rem;">
+                    Вы уверены, что хотите удалить предмет
+                    <strong id="delete-discipline-name"></strong>?
+                </p>
+                <p style="color: #888;">Это действие нельзя отменить.</p>
+            </div>
+
+            <div class="form-footer">
+                <button type="button" class="form-btn btn-cancel" id="cancel-delete-btn">Отмена</button>
+                <button type="submit" class="form-btn btn-delete" style="background-color: #d9534f; color: white;">
+                    Удалить
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+    
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const addModal = document.getElementById("subject-modal");
+    const editModal = document.getElementById("edit-subject-modal");
+    const deleteModal = document.getElementById("delete-discipline-modal");
+    const tableContainer = document.getElementById("discipline-table-body");
+    const searchInput = document.getElementById("search-discipline");
+
+    const addBtn = document.getElementById("add-subject-btn");
+    const closeButtons = document.querySelectorAll(".close-btn, .btn-cancel");
+
+    // === ОТКРЫТИЕ модалки добавления ===
+    if (addBtn) addBtn.addEventListener("click", () => addModal.classList.add("active"));
+
+    // === ЗАКРЫТИЕ всех модалок ===
+    closeButtons.forEach(btn => btn.addEventListener("click", () => {
+        document.querySelectorAll(".modal-overlay").forEach(m => m.classList.remove("active"));
+    }));
+
+    window.addEventListener("click", e => {
+        if (e.target.classList.contains("modal-overlay")) e.target.classList.remove("active");
+    });
+
+    // === Делегирование событий для кнопок редактирования и удаления ===
+    document.addEventListener("click", async (e) => {
+        // === РЕДАКТИРОВАНИЕ ===
+        const editBtn = e.target.closest(".edit-discipline-btn");
+        if (editBtn) {
+            const id = editBtn.dataset.id;
+            try {
+                const response = await fetch(`?discipline_id=${id}`);
+                const data = await response.json();
+
+                document.getElementById("edit-discipline-id").value = data.id;
+                document.getElementById("edit-name_dis").value = data.name_dis;
+                document.getElementById("edit-short_code").value = data.name_short;
+                document.getElementById("edit-duration_hours").value = data.duration_hours;
+                document.getElementById("edit-control_type").value = data.control_type;
+                document.getElementById("edit-classroom").value = data.classroom || "";
+
+                document.querySelectorAll('#edit-subject-modal input[name="status"]').forEach(r => {
+                    r.checked = (r.value === data.status);
+                });
+
+                document.querySelectorAll('#edit-teacher-list input[type="checkbox"]').forEach(chk => {
+                    chk.checked = data.teachers.includes(parseInt(chk.value));
+                });
+
+                editModal.classList.add("active");
+            } catch (error) {
+                console.error("Ошибка загрузки данных предмета:", error);
+            }
+        }
+
+        // === УДАЛЕНИЕ ===
+        const delBtn = e.target.closest(".delete-btn");
+        if (delBtn) {
+            document.getElementById("delete-discipline-id").value = delBtn.dataset.id;
+            document.getElementById("delete-discipline-name").textContent = delBtn.dataset.name;
+            deleteModal.classList.add("active");
+        }
+
+        document.querySelector("#delete-discipline-form").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const id = document.getElementById("delete-discipline-id").value;
+            if (!id) return;
+
+            try {
+                const res = await fetch(`/delete-discipline/${id}/`, {
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": getCSRFToken(),
+                    },
+                });
+
+                if (res.ok) {
+                    document.querySelector(`[data-id="${id}"]`).closest("tr").remove();
+                    document.getElementById("delete-discipline-modal").classList.remove("active");
+                } else {
+                    alert("Ошибка при удалении");
+                }
+            } catch (err) {
+                console.error("Ошибка при удалении:", err);
+            }
+        });
+
+
+        function getCSRFToken() {
+            const cookie = document.cookie.split('; ').find(r => r.startsWith('csrftoken='));
+            return cookie ? cookie.split('=')[1] : '';
+        }
+
+        // === ПАГИНАЦИЯ ===
+        if (e.target.classList.contains("page-btn")) {
+            e.preventDefault();
+            const page = e.target.dataset.page;
+            const url = `${window.location.pathname}?page=${page}`;
+            await updateTable(url);
+        }
+    });
+
+    // === Поиск ===
+    if (searchInput) {
+        searchInput.addEventListener("input", () => {
+            clearTimeout(window.searchTimer);
+            window.searchTimer = setTimeout(() => {
+                const query = searchInput.value.trim();
+                const url = new URL(window.location.href);
+                url.searchParams.set("search", query);
+                url.searchParams.delete("page");
+                updateTable(url);
+            }, 400);
+        });
+    }
+
+    // === Общая функция AJAX обновления таблицы ===
+    async function updateTable(url) {
+        try {
+            const response = await fetch(url, { headers: { "X-Requested-With": "XMLHttpRequest" } });
+            const data = await response.json();
+
+            document.querySelector("#discipline-table-body").innerHTML = data.table_html;
+            document.querySelector("#pagination").innerHTML = data.paginator_html;
+
+            document.getElementById("total-disciplines").textContent = data.total_count;
+            document.getElementById("active-disciplines").textContent = data.active_count;
+            document.getElementById("inactive-disciplines").textContent = data.inactive_count;
+        } catch (err) {
+            console.error("Ошибка обновления таблицы:", err);
+        }
+    }
+});
+
+fetch(url, { headers: { "X-Requested-With": "XMLHttpRequest" } })
+    .then(res => res.json())
+    .then(data => {
+        document.querySelector("#discipline-table-body").innerHTML = data.table_html;
+        document.querySelector("#pagination-container").innerHTML = data.paginator_html;
+
+        // Обновляем счётчики
+        document.getElementById("total-disciplines").textContent = data.total_count;
+        document.getElementById("active-disciplines").textContent = data.active_count;
+        document.getElementById("inactive-disciplines").textContent = data.inactive_count;
+    });
+</script>
+
+
+
+
+
+
+{% endblock %}

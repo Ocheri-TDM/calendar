@@ -1,0 +1,462 @@
+{% extends 'admin/admin-header.html' %}
+{% load static %}
+{% block title %}  Управление учителями  {% endblock %}
+{% block content %}
+    <link rel="stylesheet" href="{% static 'css/admin/admin-group.css' %}">
+    <link rel="stylesheet" href="{% static 'css/append.css' %}">
+
+    
+    <!-- Контейнер приложения -->
+    <div class="app-container">
+        <!-- Боковое меню -->
+        <nav class="admin-sidebar">
+            <a href="{% url 'admin-schedule' %}" class="nav-item">
+                <i class="fas fa-table"></i>
+                Расписание занятий
+            </a>
+            <a href="{% url 'admin-group' %}" class="nav-item active">
+                <i class="fas fa-users "></i>
+                Управление группами
+            </a>
+            <a href="{% url 'admin-discipline' %}" class="nav-item">
+                <i class="fas fa-book"></i>
+                Управление предметами
+            </a>
+            <a href="{% url 'admin-teacher' %}" class="nav-item">
+                <i class="fas fa-chalkboard-teacher"></i>
+                Управление преподавателями
+            </a>
+            <a href="{% url 'admin-cab' %}" class="nav-item">
+                <i class="fas fa-door-open"></i>
+                Управление аудиториями
+            </a>
+            <div class="nav-divider"></div>
+            <div class="nav-item">
+                <i class="fas fa-cog"></i>
+                Настройки системы
+            </div>
+            <div class="nav-item">
+                <i class="fas fa-sign-out-alt"></i>
+                Выход
+            </div>
+        </nav>
+        
+        <!-- Основной контент -->
+        <main class="main-content">
+            <!-- Шапка страницы -->
+            <div class="page-header">
+                <div class="page-title">
+                    <i class="fas fa-users"></i>
+                    <h2>Управление группами</h2>
+                </div>
+                <div class="actions-group">
+                    <button id="add-group-btn" class="toolbar-btn btn-main">
+                        <i class="fas fa-plus-circle"></i> Добавить группу
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Статистика групп -->
+            <div class="stats-container">
+                <div class="stat-card">
+                    <div class="filter-card-header">
+                        <div class="filter-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                    </div>
+                    <div class="stat-content">
+                        <h3>{{ total_groups }}</h3>
+                        <p>Всего групп</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="filter-icon-2">
+                        <i class="fas fa-user-graduate"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>{{ total_students }}</h3>
+                        <p>Всего студентов</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="filter-icon-3">
+                        <i class="fas fa-layer-group"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>4</h3>
+                        <p>Курсов обучения</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Поисковая панель -->
+            <div class="search-section">
+                <div class="search-group">
+                <i class="fas fa-search search-icon"></i>
+                <input
+                    type="text"
+                    id="group-search"
+                        class="search-input"
+                        placeholder="Поиск по названию группы или куратору..."
+                    >
+                </div>
+
+                <div class="filter-group">
+                    <select id="course-filter" class="form-select">
+                        <option value="">Все курсы</option>
+                        <option value="1">Курс 1</option>
+                        <option value="2">Курс 2</option>
+                        <option value="3">Курс 3</option>
+                        <option value="4">Курс 4</option>
+                        <option value="5">Курс 5</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- Таблица групп -->
+            <div class="groups-table-container">
+                <table class="groups-table">
+                    <thead>
+                        <tr>
+                            <th width="260">Группа</th>
+                            <th>Куратор</th>
+                            <th width="120">Курс</th>
+                            <th width="120">Студентов</th>
+                            <th width="140">Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody id="group-table">
+                        {% include "dinamic/group-table.html" %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Пагинация -->
+            <div id="paginator-container">
+                {% include "dinamic/paginator.html" %}
+            </div>
+        </main>
+    </div>
+    
+ <!-- 🟩 МОДАЛКА СОЗДАНИЯ ГРУППЫ -->
+<div class="modal-overlay" id="create-group-modal">
+  <div class="modal-content">
+    <form method="POST">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="create">
+
+      <div class="modal-header">
+        <h3 class="modal-title">Добавить новую группу</h3>
+        <button class="close-btn" data-close="create-group-modal">&times;</button>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Название группы</label>
+        <input type="text" class="form-input" name="name" required>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Курс</label>
+        <select class="form-select" name="course" required>
+          <option value="">Выберите курс</option>
+          <option>1</option>
+          <option>2</option>
+          <option>3</option>
+          <option>4</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Смена</label>
+        <select class="form-select" name="shift" required>
+          <option value="">Выберите смену</option>
+          <option value="1">Первая смена (дневная)</option>
+          <option value="2">Вторая смена (послеобеденная)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Куратор</label>
+        <div class="search-section-2">
+          <div class="search-group">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" class="search-input" id="teacher-search-create" placeholder="(Например: Маркус Наталья)">
+          </div>
+        </div>
+
+        <div class="teacher-list" id="teacher-list-create">
+          {% for t in teachers %}
+          <label class="teacher-item">
+            <input type="radio" name="supervisor" value="{{ t.id }}">
+            <span>{{ t.last_name }} {{ t.first_name }} {{ t.patronymic|default:'' }}</span>
+          </label>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Количество студентов</label>
+        <input type="number" class="form-input" name="students_count" min="0" required>
+      </div>
+
+      <div class="form-footer">
+        <button type="button" class="form-btn btn-cancel" data-close="create-group-modal">Отмена</button>
+        <button type="submit" class="form-btn btn-save">Создать группу</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+<!-- 🟦 МОДАЛКА РЕДАКТИРОВАНИЯ -->
+<div class="modal-overlay" id="edit-group-modal">
+  <div class="modal-content">
+    <form method="POST">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="edit">
+      <input type="hidden" name="group_id" id="edit-group-id">
+
+      <div class="modal-header">
+        <h3 class="modal-title">Редактировать группу</h3>
+        <button class="close-btn" data-close="edit-group-modal">&times;</button>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Название группы</label>
+        <input type="text" class="form-input" id="edit-name" name="name" required>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Курс</label>
+        <select class="form-select" id="edit-course" name="course" required>
+          <option>1</option>
+          <option>2</option>
+          <option>3</option>
+          <option>4</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Смена</label>
+        <select class="form-select" id="edit-shift" name="shift" required>
+          <option value="1">Первая смена (дневная)</option>
+          <option value="2">Вторая смена (послеобеденная)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Куратор</label>
+        <div class="search-section-2">
+          <div class="search-group">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" class="search-input" id="teacher-search-edit" placeholder="(Например: Маркус Наталья)">
+          </div>
+        </div>
+
+        <div class="teacher-list" id="teacher-list-edit">
+          {% for t in teachers %}
+          <label class="teacher-item">
+            <input type="radio" name="supervisor" value="{{ t.id }}">
+            <span>{{ t.last_name }} {{ t.first_name }} {{ t.patronymic|default:'' }}</span>
+          </label>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Количество студентов</label>
+        <input type="number" class="form-input" id="edit-students" name="students_count" min="0" required>
+      </div>
+
+      <div class="form-footer">
+        <button type="button" class="form-btn btn-cancel" data-close="edit-group-modal">Отмена</button>
+        <button type="submit" class="form-btn btn-save">Сохранить изменения</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+
+
+<!-- 🗑️ Модалка для удаления группы -->
+<div class="modal-overlay" id="delete-group-modal">
+  <div class="modal-content">
+    <form method="POST">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="delete">
+      <input type="hidden" name="group_id" id="delete-group-id">
+
+      <div class="modal-header">
+        <h3 class="modal-title">Удалить группу</h3>
+        <button class="close-btn" data-close="delete-group-modal">&times;</button>
+      </div>
+
+      <p class="confirm-text">Вы уверены, что хотите удалить эту группу?</p>
+
+      <div class="form-footer">
+        <button type="button" class="form-btn btn-cancel" data-close="delete-group-modal">Отмена</button>
+        <button type="submit" class="form-btn btn-save btn-danger">Удалить</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const searchInput = document.querySelector(".search-input");
+  const courseFilter = document.querySelector(".form-select");
+  const tableBody = document.getElementById("group-table");
+  const paginatorContainer = document.getElementById("paginator-container");
+
+  let debounceTimer;
+  let lastQuery = "";
+
+  /* ==========================================================
+     🧩 Обновление таблицы (AJAX)
+  ========================================================== */
+  function updateGroupTable(url = null) {
+    if (!url) {
+      url = new URL(window.location.href);
+      const query = searchInput?.value.trim();
+      const course = courseFilter?.value;
+
+      if (query) url.searchParams.set("search", query);
+      else url.searchParams.delete("search");
+
+      // ✅ курс фильтруем только если не пустой value
+      if (course) url.searchParams.set("course", course);
+      else url.searchParams.delete("course");
+
+      url.searchParams.delete("page"); // при новом поиске сбрасываем страницу
+    }
+
+    lastQuery = url.toString();
+
+    fetch(url, { headers: { "X-Requested-With": "XMLHttpRequest" } })
+      .then(res => res.json())
+      .then(data => {
+        if (url.toString() !== lastQuery) return;
+
+        tableBody.innerHTML = data.table;
+        paginatorContainer.innerHTML = data.paginator;
+
+        attachRowActions();
+        attachPaginatorEvents();
+      })
+      .catch(err => console.error("Ошибка обновления:", err));
+  }
+
+  /* ==========================================================
+     🔢 ПАГИНАЦИЯ (с сохранением фильтров)
+  ========================================================== */
+  function attachPaginatorEvents() {
+    paginatorContainer.querySelectorAll(".page-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const page = btn.dataset.page;
+        const url = new URL(window.location.href);
+
+        const query = searchInput?.value.trim();
+        const course = courseFilter?.value;
+
+        if (query) url.searchParams.set("search", query);
+        else url.searchParams.delete("search");
+
+        if (course) url.searchParams.set("course", course);
+        else url.searchParams.delete("course");
+
+        url.searchParams.set("page", page);
+
+        updateGroupTable(url);
+      });
+    });
+  }
+
+  /* ==========================================================
+     ✏️ Действия строк (редактирование / удаление)
+  ========================================================== */
+  function attachRowActions() {
+    document.querySelectorAll(".edit-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const modal = document.getElementById("edit-group-modal");
+        modal.classList.add("active");
+
+        document.getElementById("edit-group-id").value = btn.dataset.id;
+        document.getElementById("edit-name").value = btn.dataset.name;
+        document.getElementById("edit-course").value = btn.dataset.course;
+        document.getElementById("edit-shift").value = btn.dataset.shift;
+        document.getElementById("edit-students").value = btn.dataset.students;
+
+        document.querySelectorAll("#teacher-list-edit input[name='supervisor']").forEach(radio => {
+          radio.checked = (radio.value === btn.dataset.supervisor);
+        });
+      });
+    });
+
+    document.querySelectorAll(".delete-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const modal = document.getElementById("delete-group-modal");
+        modal.querySelector("#delete-group-id").value = btn.dataset.id;
+        modal.classList.add("active");
+      });
+    });
+  }
+
+  /* ==========================================================
+     ⚙️ МОДАЛКИ
+  ========================================================== */
+  function setupModals() {
+    const modals = document.querySelectorAll(".modal-overlay");
+
+    document.querySelectorAll("[data-close]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.getElementById(btn.dataset.close)?.classList.remove("active");
+      });
+    });
+
+    modals.forEach(modal => {
+      modal.addEventListener("click", e => {
+        if (e.target === modal) modal.classList.remove("active");
+      });
+    });
+
+    const createBtn = document.getElementById("add-group-btn");
+    if (createBtn) {
+      createBtn.addEventListener("click", () => {
+        document.getElementById("create-group-modal").classList.add("active");
+      });
+    }
+  }
+
+  /* ==========================================================
+     🔍 ПОИСК + ФИЛЬТР
+  ========================================================== */
+  if (searchInput) {
+    searchInput.addEventListener("input", () => {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(updateGroupTable, 400);
+    });
+  }
+
+  if (courseFilter) {
+    courseFilter.addEventListener("change", () => {
+      updateGroupTable();
+    });
+  }
+
+  /* ==========================================================
+     🚀 ИНИЦИАЛИЗАЦИЯ
+  ========================================================== */
+  setupModals();
+  attachRowActions();
+  attachPaginatorEvents();
+});
+</script>
+
+
+
+
+{% endblock %}

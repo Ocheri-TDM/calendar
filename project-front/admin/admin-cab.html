@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="filename" content="auditoriums_simplified.html">
+    <title>Управление аудиториями - Колледж ИТ</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/header.css">
+    <link rel="stylesheet" href="../css/admin/admin-cab.css">
+    <link rel="stylesheet" href="../css/append.css">
+</head>
+<body>
+    <!-- Шапка -->
+    <header class="admin-header">
+        <div class="logo">
+            <i class="fas fa-calendar-alt"></i>
+            <h1>Управление аудиториями</h1>
+        </div>
+        <div class="admin-controls">
+            <div class="notification-btn">
+                <i class="fas fa-bell"></i>
+                <div class="notification-badge">3</div>
+            </div>
+            <div class="admin-user">
+                <div class="user-avatar">АД</div>
+                <div class="user-info">
+                    <div class="user-name">Администратор</div>
+                    <div class="user-role">Администратор</div>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Контейнер приложения -->
+    <div class="app-container">
+        <!-- Боковое меню -->
+        <nav class="admin-sidebar">
+            <a href="admin-schedule-main.html" class="nav-item">
+                <i class="fas fa-table"></i>
+                Расписание занятий
+            </a>
+            <a href="admin-group.html" class="nav-item">
+                <i class="fas fa-users "></i>
+                Управление группами
+            </a>
+            <a href="admin-discipline.html" class="nav-item">
+                <i class="fas fa-book"></i>
+                Управление предметами
+            </a>
+            <a href="admin-teacher.html" class="nav-item">
+                <i class="fas fa-chalkboard-teacher"></i>
+                Управление преподавателями
+            </a>
+            <a href="admin-cab.html" class="nav-item active">
+                <i class="fas fa-door-open"></i>
+                Управление аудиториями
+            </a>
+            <div class="nav-divider"></div>
+            <div class="nav-item">
+                <i class="fas fa-cog"></i>
+                Настройки системы
+            </div>
+            <div class="nav-item">
+                <i class="fas fa-sign-out-alt"></i>
+                Выход
+            </div>
+        </nav>
+        
+        <!-- Основной контент -->
+        <main class="main-content">
+            <!-- Шапка страницы -->
+            <div class="page-header">
+                <div class="page-title">
+                    <i class="fas fa-door-open"></i>
+                    <h2>Управление аудиториями</h2>
+                </div>
+                <div class="actions-group">
+                    <button id="add-auditorium-btn" class="toolbar-btn btn-main">
+                        <i class="fas fa-plus-circle"></i> Добавить аудиторию
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Этажный план -->
+            <div class="floors-container">
+                <div class="floor-section">
+                    <div class="floor-header">
+                        <i class="fas fa-layer-group"></i>
+                        Этаж 3
+                    </div>
+                    <div class="classroom-list">
+                        <div class="classroom">301</div>
+                        <div class="classroom">302</div>
+                        <div class="classroom">303</div>
+                        <div class="classroom">304</div>
+                        <div class="classroom">305</div>
+                        <div class="classroom">306</div>
+                        <div class="classroom">307</div>
+                        <div class="classroom">308</div>
+                    </div>
+                </div>
+                
+                <div class="floor-section">
+                    <div class="floor-header">
+                        <i class="fas fa-layer-group"></i>
+                        Этаж 4
+                    </div>
+                    <div class="classroom-list">
+                        <div class="classroom">401</div>
+                        <div class="classroom">402</div>
+                        <div class="classroom">403</div>
+                        <div class="classroom">404</div>
+                        <div class="classroom">405</div>
+                        <div class="classroom active">406</div>
+                    </div>
+                </div>
+                
+                <div class="floor-section">
+                    <div class="floor-header">
+                        <i class="fas fa-layer-group"></i>
+                        Этаж 5
+                    </div>
+                    <div class="classroom-list">
+                        <div class="classroom">501</div>
+                        <div class="classroom">502</div>
+                        <div class="classroom">503</div>
+                        <div class="classroom">504</div>
+                        <div class="classroom">505</div>
+                        <div class="classroom">506</div>
+                    </div>
+                </div>
+                
+                <div class="floor-section">
+                    <div class="floor-header">
+                        <i class="fas fa-layer-group"></i>
+                        Этаж 6
+                    </div>
+                    <div class="classroom-list">
+                        <div class="classroom">601</div>
+                        <div class="classroom">602</div>
+                        <div class="classroom">603</div>
+                        <div class="classroom">604</div>
+                        <div class="classroom">605</div>
+                    </div>
+                </div>
+                
+                <div class="floor-section">
+                    <div class="floor-header">
+                        <i class="fas fa-layer-group"></i>
+                        Этаж 7
+                    </div>
+                    <div class="classroom-list">
+                        <div class="classroom">701</div>
+                        <div class="classroom">702</div>
+                        <div class="classroom">703</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Поисковая панель -->
+            <div class="search-section">
+                <div class="search-group">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" class="search-input" placeholder="Поиск по номеру аудитории (например, 301)">
+                </div>
+            </div>
+            
+            <!-- Таблица аудиторий -->
+            <div class="auditoriums-table-container">
+                <table class="auditoriums-table">
+                    <thead>
+                        <tr>
+                            <th>Номер аудитории</th>
+                            <th>Этаж</th>
+                            <th>Статус</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div class="auditorium-number">301</div>
+                            </td>
+                            <td class="auditorium-floor">3 этаж</td>
+                            <td><span class="badge badge-success">Доступна</span></td>
+                            <td class="actions-cell">
+                                <button class="action-btn edit-btn edit-auditorium-btn">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="action-btn delete-btn">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="auditorium-number">505</div>
+                            </td>
+                            <td class="auditorium-floor">5 этаж</td>
+                            <td><span class="badge badge-warning">Занята</span></td>
+                            <td class="actions-cell">
+                                <button class="action-btn edit-btn edit-auditorium-btn">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="action-btn delete-btn">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="auditorium-number">406</div>
+                            </td>
+                            <td class="auditorium-floor">4 этаж</td>
+                            <td><span class="badge badge-success">Доступна</span></td>
+                            <td class="actions-cell">
+                                <button class="action-btn edit-btn edit-auditorium-btn">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="action-btn delete-btn">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="auditorium-number">603</div>
+                            </td>
+                            <td class="auditorium-floor">6 этаж</td>
+                            <td><span class="badge badge-success">Доступна</span></td>
+                            <td class="actions-cell">
+                                <button class="action-btn edit-btn edit-auditorium-btn">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="action-btn delete-btn">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="auditorium-number">702</div>
+                            </td>
+                            <td class="auditorium-floor">7 этаж</td>
+                            <td><span class="badge badge-success">Доступна</span></td>
+                            <td class="actions-cell">
+                                <button class="action-btn edit-btn edit-auditorium-btn">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="action-btn delete-btn">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Пагинация -->
+            <div class="pagination">
+                <button><i class="fas fa-chevron-left"></i></button>
+                <button class="active">1</button>
+                <button>2</button>
+                <button>3</button>
+                <button><i class="fas fa-chevron-right"></i></button>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Модальное окно добавления/редактирования аудитории -->
+    <div class="modal-overlay" id="auditorium-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Добавить аудиторию</h3>
+                <button class="close-btn" id="close-modal">&times;</button>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Номер аудитории</label>
+                <input type="text" class="form-input" placeholder="Например: 301 или 505">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Этаж</label>
+                <select class="form-select">
+                    <option>3</option>
+                    <option selected>4</option>
+                    <option>5</option>
+                    <option>6</option>
+                    <option>7</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Статус доступности</label>
+                <select class="form-select">
+                    <option selected>Доступна</option>
+                    <option>Занята</option>
+                    <option>На ремонте</option>
+                </select>
+            </div>
+            <div class="form-footer">
+                <button class="form-btn btn-cancel" id="cancel-btn">Отмена</button>
+                <button class="form-btn btn-save">Сохранить аудиторию</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Управление модальным окном
+        const addAuditoriumBtn = document.getElementById('add-auditorium-btn');
+        const modal = document.getElementById('auditorium-modal');
+        const closeButtons = document.querySelectorAll('.close-btn, .btn-cancel');
+        const editButtons = document.querySelectorAll('.edit-auditorium-btn');
+        const modalTitle = document.querySelector('.modal-title');
+        const classrooms = document.querySelectorAll('.classroom');
+        
+        addAuditoriumBtn.addEventListener('click', () => {
+            modalTitle.textContent = "Добавить аудиторию";
+            modal.classList.add('active');
+        });
+        
+        editButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                modalTitle.textContent = "Редактировать аудиторию";
+                modal.classList.add('active');
+            });
+        });
+        
+        closeButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                modal.classList.remove('active');
+            });
+        });
+        
+        // Подсветка аудиторий на плане этажей
+        classrooms.forEach(classroom => {
+            classroom.addEventListener('click', function() {
+                classrooms.forEach(c => c.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+        
+        // Закрытие модального окна при клике вне его
+        window.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.remove('active');
+            }
+        });
+    </script>
+</body>

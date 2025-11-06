@@ -1,0 +1,315 @@
+:root {
+            --primary-dark: #2980B9;
+            --primary: #4361ee;
+            --secondary: #3a0ca3;
+            --accent: #4cc9f0;
+            --light-blue: #f0f7ff;
+            --success: #4caf50;
+            --warning: #ffb703;
+            --alert: #e63946;
+            --light: #f8f9fa;
+            --gray: #95a5a6;
+            --border: #cbd5e1;
+            --header-height: 80px;
+            --sidebar-width: 280px;
+            --transition: all 0.3s ease;
+            --card-bg: #ffffff;
+            --sidebar-bg: #ffffff;
+            --main-bg: #f5f7ff;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Nunito', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--main-bg);
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        /* Анимации */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Шапка админа - Яркая */
+        .admin-header {
+            height: var(--header-height);
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 0 2.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            font-weight: 700;
+            font-size: 1.5rem;
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        .logo i {
+            margin-right: 15px;
+            font-size: 1.8rem;
+            color: var(--accent);
+        }
+        
+        .admin-controls {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+        
+        .admin-user {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: rgba(255,255,255,0.2);
+            padding: 6px 15px;
+            border-radius: 30px;
+        }
+        
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), #72efdd);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.1rem;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        }
+        
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .user-name {
+            font-weight: 600;
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        .user-role {
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.85);
+        }
+        
+        .notification-btn {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--warning), #fb8500);
+            color: white;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.3s;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+        }
+        
+        .notification-btn:hover {
+            transform: rotate(10deg) scale(1.05);
+        }
+        
+        .notification-badge {
+            position: absolute;
+            top: -4px;
+            right: -5px;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: var(--alert);
+            color: white;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+        
+        /* Боковая панель администратора - Светлая! */
+        .admin-container {
+            display: flex;
+            min-height: calc(100vh - var(--header-height));
+        }
+        
+        .admin-sidebar {
+            width: var(--sidebar-width);
+            background: var(--sidebar-bg);
+            padding: 1.5rem 0;
+            box-shadow: 0 0 25px rgba(0,0,0,0.07);
+            overflow-y: auto;
+            z-index: 90;
+        }
+        
+        .nav-item {
+            text-decoration: none;
+            color: #555;
+            padding: 0.9rem 1.8rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            transition: var(--transition);
+            position: relative;
+            margin-bottom: 3px;
+            border-radius: 0 50px 50px 0;
+            overflow: hidden;
+        }
+        
+        .nav-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 5px;
+            background: var(--primary);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-item:hover, .nav-item.active {
+            background: rgba(67, 97, 238, 0.07);
+            color: var(--primary);
+        }
+        
+        .nav-item.active {
+            font-weight: 700;
+        }
+        
+        .nav-item.active::before {
+            opacity: 1;
+        }
+        
+        .nav-item i {
+            margin-right: 15px;
+            font-size: 1.2rem;
+            width: 25px;
+            text-align: center;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .nav-divider {
+            height: 1px;
+            background: rgba(203, 213, 225, 0.5);
+            margin: 1.5rem 1.8rem;
+        }
+
+
+ /* Адаптивность */
+        @media (max-width: 1300px) {
+            .filters {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .admin-header {
+                padding: 0 1.5rem;
+            }
+            
+            .admin-container {
+                flex-direction: column;
+            }
+            
+            .admin-sidebar {
+                width: 100%;
+                height: auto;
+                padding: 1.2rem 1.5rem;
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+            
+            .nav-item {
+                margin-bottom: 0;
+                padding: 0.8rem 1.2rem;
+                border-radius: 12px;
+            }
+            
+            .nav-item::before {
+                width: 100%;
+                height: 5px;
+                top: auto;
+                bottom: 0;
+                left: 0;
+            }
+            
+            .nav-divider {
+                display: none;
+            }
+        }
+        
+        @media (max-width: 1150px) {
+            .admin-main-content {
+                padding: 1.5rem;
+            }
+            .logo h1{
+                font-size: 36px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .admin-header {
+                flex-direction: column;
+                height: auto;
+                padding: 20px 1.5rem;
+                gap: 20px;
+            }
+            
+            .filters {
+                grid-template-columns: 1fr;
+            }
+            
+            .toolbar {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .admin-main-content {
+                padding: 1.2rem;
+            }
+
+            .logo h1{
+                font-size: 28px;
+            }
+            
+        }
+        
+        @media (max-width: 576px) {
+            .admin-user {
+                font-size: 0.9rem;
+                padding: 6px 10px;
+                gap: 10px;
+            }
+            
+            .user-avatar {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .notification-btn {
+                width: 40px;
+                height: 40px;
+            }
+        }
+

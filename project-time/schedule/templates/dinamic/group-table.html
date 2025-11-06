@@ -1,0 +1,33 @@
+{% for group in groups %}
+                            <tr>
+                                <td>
+                                    <div class="group-name">
+                                        <i class="fas fa-users"></i>
+                                        <span>{{ group.name_group }}</span>
+                                    </div>
+                                    <div class="group-details">Смена: {{ group.get_shift_display }}</div>
+                                </td>
+                                <td>{{ group.supervisor|default:"—" }}</td>
+                                <td>{{ group.course }}</td>
+                                <td>{{ group.students_count }}</td>
+                                <td class="actions-cell">
+                                    <button class="action-btn edit-btn edit-group-btn"
+                                            data-id="{{ group.id }}"
+                                            data-name="{{ group.name_group }}"
+                                            data-course="{{ group.course }}"
+                                            data-shift="{{ group.shift }}"
+                                            data-students="{{ group.students_count }}"
+                                            data-shift="{{ group.shift }}"
+                                            {% if group.supervisor %}
+                                                data-supervisor="{{ group.supervisor.id }}"
+                                            {% endif %}>
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="action-btn delete-btn" data-id="{{ group.id }}">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr><td colspan="5" style="text-align:center;">Нет групп</td></tr>
+                        {% endfor %}

@@ -1,0 +1,76 @@
+{% load custom_tags %}
+
+{% for weekday in 1|to:5 %}
+    {% with lessons=schedule_by_day|get_item:weekday %}
+    <ul class="schedule-col" data-weekday="{{ weekday }}">
+
+        {# ✅ Если вторник — автоматически вставляем кураторский час перед парами #}
+        {% if weekday == 2 %}
+        <li class="admin-class-slot">
+            <div class="admin-class-card mentoring-card">
+                <div class="admin-subject-name">Кураторский час</div>
+                
+                {# Время зависит от смены #}
+                {% if selected_group.shift == 2 %}
+                    <div class="admin-class-time">13:00 - 13:25</div>
+                {% else %}
+                    <div class="admin-class-time">8:00 - 8:25</div>
+                {% endif %}
+
+                {# Куратор берётся из supervisor #}
+                <div class="admin-teacher-name">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                    {% if selected_group.supervisor %}
+                        {{ selected_group.supervisor.last_name }}
+                        {{ selected_group.supervisor.first_name|first }}.
+                        {{ selected_group.supervisor.patronymic|first }}.
+                    {% else %}
+                        Не назначен
+                    {% endif %}
+                </div>
+
+                <div class="admin-room-info">
+                    <i class="fas fa-door-open"></i> Ауд. 301
+                </div>
+            </div>
+        </li>
+        {% endif %}
+
+        {# 🔹 Обычные пары #}
+        {% for lesson in lessons %}
+            <li class="admin-class-slot">
+                <div class="admin-class-card">
+                    <div class="admin-subject-name">{{ lesson.discipline.name_dis }}</div>
+                    <div class="admin-class-time">
+                        {{ lesson.start_time|time:"H:i" }} - {{ lesson.end_time|time:"H:i" }}
+                    </div>
+                    <div class="admin-teacher-name">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                        {{ lesson.teacher.last_name }} {{ lesson.teacher.first_name|first }}.{{ lesson.teacher.patronymic|first }}.
+                    </div>
+                    <div class="admin-room-info">
+                        <i class="fas fa-door-open"></i>
+                        {% if lesson.classroom %}
+                            {{ lesson.classroom.number_room }}
+                        {% else %}
+                            Не указано
+                        {% endif %}
+                    </div>
+                    <div class="admin-room-info-2">{{ lesson.lesson_number }} пара</div>
+                </div>
+            </li>
+        {% endfor %}
+
+        {# ✅ Ограничение добавления до 4 пар #}
+        {% if lessons|length < 4 %}
+            <li class="admin-class-slot add-slot">
+                <div class="admin-class-card add-card add-class-btn"
+                    data-weekday="{{ weekday }}">
+                    <div class="add-icon"><i class="fas fa-plus"></i></div>
+                    <div class="add-text">Добавить занятие</div>
+                </div>
+            </li>
+        {% endif %}
+    </ul>
+    {% endwith %}
+{% endfor %}

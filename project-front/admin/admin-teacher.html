@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="filename" content="teachers_management.html">
+    <title>Управление преподавателями - Колледж ИТ</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="../css/header.css">
+    <link rel="stylesheet" href="../css/admin/admin-teacher.css">
+    <link rel="stylesheet" href="../css/append.css">
+</head>
+<body>
+    <!-- Шапка -->
+    <header class="admin-header">
+        <div class="logo">
+            <i class="fas fa-calendar-alt"></i>
+            <h1>Управление преподавателями</h1>
+        </div>
+        <div class="admin-controls">
+            <div class="notification-btn">
+                <i class="fas fa-bell"></i>
+                <div class="notification-badge">3</div>
+            </div>
+            <div class="admin-user">
+                <div class="user-avatar">АД</div>
+                <div class="user-info">
+                    <div class="user-name">Администратор</div>
+                    <div class="user-role">Администратор</div>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Контейнер приложения -->
+    <div class="app-container">
+        <!-- Боковое меню -->
+        <nav class="admin-sidebar">
+            <a href="admin-schedule-main.html" class="nav-item">
+                <i class="fas fa-table"></i>
+                Расписание занятий
+            </a>
+            <a href="admin-group.html" class="nav-item">
+                <i class="fas fa-users "></i>
+                Управление группами
+            </a>
+            <a href="admin-discipline.html" class="nav-item">
+                <i class="fas fa-book"></i>
+                Управление предметами
+            </a>
+            <a href="admin-teacher.html" class="nav-item active">
+                <i class="fas fa-chalkboard-teacher"></i>
+                Управление преподавателями
+            </a>
+            <a href="admin-cab.html" class="nav-item">
+                <i class="fas fa-door-open"></i>
+                Управление аудиториями
+            </a>
+            <div class="nav-divider"></div>
+            <div class="nav-item">
+                <i class="fas fa-cog"></i>
+                Настройки системы
+            </div>
+            <div class="nav-item">
+                <i class="fas fa-sign-out-alt"></i>
+                Выход
+            </div>
+        </nav>
+        
+        <!-- Основной контент -->
+        <main class="main-content">
+            <!-- Шапка страницы -->
+            <div class="page-header">
+                <div class="page-title">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                    <h2>Управление преподавательским составом</h2>
+                </div>
+                <div class="actions-group">
+                    <button class="toolbar-btn btn-main">
+                        <i class="fas fa-plus-circle"></i> Добавить преподавателя
+                    </button>
+                </div>
+            </div>
+
+            <!-- Карточки преподавателей -->
+            <div class="teachers-grid">
+                <!-- Преподаватель 1 -->
+                <div class="teacher-card">
+                    <div class="card-header">
+                        <div class="teacher-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div>
+                            <div class="teacher-name">Иванов Александр Сергеевич</div>
+                            <div class="teacher-position">Старший преподаватель</div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="teacher-meta">
+                            <div class="meta-item">
+                                <div class="meta-icon">
+                                    <i class="fas fa-envelope"></i>
+                                </div>
+                                <div class="meta-content">
+                                    ivanov@college.edu
+                                </div>
+                            </div>
+                            <div class="meta-item">
+                                <div class="meta-icon">
+                                    <i class="fas fa-phone"></i>
+                                </div>
+                                <div class="meta-content">
+                                    +7 (495) 123-45-67
+                                </div>
+                            </div>
+                            <div class="meta-item">
+                                <div class="meta-icon">
+                                    <i class="fas fa-building"></i>
+                                </div>
+                                <div class="meta-content">
+                                    Кафедра информатики и ПО
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="teacher-stats">
+                            <div class="stat-box">
+                                <div class="stat-value">5</div>
+                                <div class="stat-label">предметов</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-value">8</div>
+                                <div class="stat-label">часов в неделю</div>
+                            </div>
+                        </div>
+                        
+                        <div class="meta-item">
+                            <div class="meta-icon">
+                                <i class="fas fa-book"></i>
+                            </div>
+                            <div class="meta-content">
+                                <strong>Предметы:</strong> 
+                                Программирование, Алгоритмы, БД
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <button class="card-btn edit-btn edit-teacher-btn">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="card-btn delete-btn">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Преподаватель 2 -->
+                <div class="teacher-card">
+                    <div class="card-header">
+                        <div class="teacher-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div>
+                            <div class="teacher-name">Петрова Елена Николаевна</div>
+                            <div class="teacher-position">Профессор</div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="teacher-meta">
+                            <div class="meta-item">
+                                <div class="meta-icon">
+                                    <i class="fas fa-envelope"></i>
+                                </div>
+                                <div class="meta-content">
+                                    petrova@college.edu
+                                </div>
+                            </div>
+                            <div class="meta-item">
+                                <div class="meta-icon">
+                                    <i class="fas fa-phone"></i>
+                                </div>
+                                <div class="meta-content">
+                                    +7 (495) 234-56-78
+                                </div>
+                            </div>
+                            <div class="meta-item">
+                                <div class="meta-icon">
+                                    <i class="fas fa-building"></i>
+                                </div>
+                                <div class="meta-content">
+                                    Кафедра математики
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="teacher-stats">
+                            <div class="stat-box">
+                                <div class="stat-value">3</div>
+                                <div class="stat-label">предметов</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-value">6</div>
+                                <div class="stat-label">часов в неделю</div>
+                            </div>
+                        </div>
+                        
+                        <div class="meta-item">
+                            <div class="meta-icon">
+                                <i class="fas fa-book"></i>
+                            </div>
+                            <div class="meta-content">
+                                <strong>Предметы:</strong> 
+                                Математика, Логика, Статистика
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <button class="card-btn edit-btn edit-teacher-btn">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="card-btn delete-btn">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Преподаватель 3 -->
+                <div class="teacher-card">
+                    <div class="card-header">
+                        <div class="teacher-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div>
+                            <div class="teacher-name">Петрова Елена Николаевна</div>
+                            <div class="teacher-position">Профессор</div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="teacher-meta">
+                            <div class="meta-item">
+                                <div class="meta-icon">
+                                    <i class="fas fa-envelope"></i>
+                                </div>
+                                <div class="meta-content">
+                                    petrova@college.edu
+                                </div>
+                            </div>
+                            <div class="meta-item">
+                                <div class="meta-icon">
+                                    <i class="fas fa-phone"></i>
+                                </div>
+                                <div class="meta-content">
+                                    +7 (495) 234-56-78
+                                </div>
+                            </div>
+                            <div class="meta-item">
+                                <div class="meta-icon">
+                                    <i class="fas fa-building"></i>
+                                </div>
+                                <div class="meta-content">
+                                    Кафедра математики
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="teacher-stats">
+                            <div class="stat-box">
+                                <div class="stat-value">3</div>
+                                <div class="stat-label">предметов</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-value">6</div>
+                                <div class="stat-label">часов в неделю</div>
+                            </div>
+                        </div>
+                        
+                        <div class="meta-item">
+                            <div class="meta-icon">
+                                <i class="fas fa-book"></i>
+                            </div>
+                            <div class="meta-content">
+                                <strong>Предметы:</strong> 
+                                Математика, Логика, Статистика
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <button class="card-btn edit-btn edit-teacher-btn">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="card-btn delete-btn">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>
+                            

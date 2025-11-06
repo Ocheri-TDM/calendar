@@ -1,0 +1,63 @@
+{% for dis in page_obj %}
+                        <tr>
+                            <td>
+                                <div class="subject-name">
+                                    <i class="fas fa-book"></i>
+                                    <div>
+                                        {{ dis.name_dis }}
+                                        <div class="subject-shortcode">{{ dis.name_short }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="subject-details">
+                                {% if dis.classroom %}
+                                    {{ dis.classroom.number_room }} (Этаж {{ dis.classroom.floor }})
+                                {% else %}
+                                    —
+                                {% endif %}
+                            </td>
+                            <td>{{ dis.duration_hours }}</td>
+                           <td>
+                                {% if dis.control_type == "exam" %}
+                                    <span class="badge badge-warning">{{ dis.get_control_type_display }}</span>
+                                {% elif dis.control_type == "test" %}
+                                    <span class="badge badge-primary">{{ dis.get_control_type_display }}</span>
+                                {% elif dis.control_type == "coursework" %}
+                                    <span class="badge badge-info">{{ dis.get_control_type_display }}</span>
+                                {% else %}
+                                    <span class="badge">{{ dis.get_control_type_display }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if dis.status == "active" %}
+                                    <span class="badge badge-success">Активен</span>
+                                {% else %}
+                                    <span class="badge badge-secondary">Не активен</span>
+                                {% endif %}
+                            </td>
+                            <td class="actions-cell">
+                                <button class="action-btn edit-btn edit-discipline-btn"
+                                        data-id="{{ dis.id }}"
+                                        data-name="{{ dis.name_dis }}"
+                                        data-short="{{ dis.name_short }}"
+                                        data-duration="{{ dis.duration_hours }}"
+                                        data-control="{{ dis.control_type }}"
+                                        data-status="{{ dis.status }}">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+
+                                <button class="action-btn delete-btn"
+                                        data-id="{{ dis.id }}"
+                                        data-name="{{ dis.name_dis }}">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" style="text-align:center; padding: 20px;">
+                                Предметов пока нет
+                            </td>
+                        </tr>
+                        {% endfor %}
+

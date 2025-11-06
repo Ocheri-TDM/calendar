@@ -1,0 +1,396 @@
+{% extends 'admin/admin-header.html' %}
+{% load static %}
+{% block title %}  Управление учителями  {% endblock %}
+{% block content %}
+    <link rel="stylesheet" href="{% static 'css/admin/admin-cab.css' %}">
+    <link rel="stylesheet" href="{% static 'css/append.css' %}">
+
+    
+    <!-- Контейнер приложения -->
+    <div class="app-container">
+        <!-- Боковое меню -->
+        <nav class="admin-sidebar">
+            <a href="{% url 'admin-schedule' %}" class="nav-item ">
+                <i class="fas fa-table"></i>
+                Расписание занятий
+            </a>
+            <a href="{% url 'admin-group' %}" class="nav-item">
+                <i class="fas fa-users "></i>
+                Управление группами
+            </a>
+            <a href="{% url 'admin-discipline' %}" class="nav-item">
+                <i class="fas fa-book"></i>
+                Управление предметами
+            </a>
+            <a href="{% url 'admin-teacher' %}" class="nav-item">
+                <i class="fas fa-chalkboard-teacher"></i>
+                Управление преподавателями
+            </a>
+            <a href="{% url 'admin-cab' %}" class="nav-item active">
+                <i class="fas fa-door-open"></i>
+                Управление аудиториями
+            </a>
+            <div class="nav-divider"></div>
+            <div class="nav-item">
+                <i class="fas fa-cog"></i>
+                Настройки системы
+            </div>
+            <div class="nav-item">
+                <i class="fas fa-sign-out-alt"></i>
+                Выход
+            </div>
+        </nav>
+        
+        <!-- Основной контент -->
+        <main class="main-content">
+            <!-- Шапка страницы -->
+            <div class="page-header">
+                <div class="page-title">
+                    <i class="fas fa-door-open"></i>
+                    <h2>Управление аудиториями</h2>
+                </div>
+                <div class="actions-group">
+                    <button id="add-auditorium-btn" class="toolbar-btn btn-main">
+                        <i class="fas fa-plus-circle"></i> Добавить аудиторию
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Этажный план -->
+            <div class="floors-container">
+            {% for floor, rooms in floors %}
+                <div class="floor-section">
+                <div class="floor-header">
+                    <i class="fas fa-layer-group"></i>
+                    Этаж {{ floor }}
+                </div>
+                <div class="classroom-list">
+                    {% for room in rooms %}
+                    <div class="classroom 
+                        {% if room.status == 'busy' %}active{% endif %}"
+                        data-number="{{ room.number_room }}"
+                        data-status="{{ room.status }}">
+                        {{ room.number_room }}
+                    </div>
+                    {% endfor %}
+                </div>
+                </div>
+            {% endfor %}
+            </div>
+
+            
+            <!-- Поисковая панель -->
+            <div class="search-section">
+                <div class="search-group">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" class="search-input" placeholder="Поиск по номеру аудитории (например, 301)">
+                </div>
+            </div>
+            
+            <!-- Таблица аудиторий -->
+            <div  class="auditoriums-table-container">
+                <table class="auditoriums-table">
+                    <thead>
+                        <tr>
+                            <th>Номер аудитории</th>
+                            <th>Этаж</th>
+                            <th>Статус</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cab-table-container">
+                        {% include "dinamic/cab-table.html" %}
+                    </tbody>
+
+                </table>
+            </div>
+            
+            <!-- Пагинация -->
+            <div id="paginator-container">
+                {% include "dinamic/paginator.html" %}
+            </div>
+           
+
+        </main>
+    </div>
+    
+    <!-- Модальное окно добавления/редактирования аудитории -->
+    <!-- Модальное окно добавления -->
+<div class="modal-overlay" id="auditorium-modal-add">
+    <div class="modal-content">
+        <form method="POST">
+            {% csrf_token %}
+            <div class="modal-header">
+                <h3 class="modal-title">Добавить аудиторию</h3>
+                <button type="button" class="close-btn">&times;</button>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Номер аудитории</label>
+                <input type="text" name="number_room" class="form-input" placeholder="Например: 301 или 505" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Этаж</label>
+                <select name="floor" class="form-select">
+                    <option>3</option>
+                    <option>4</option>
+                    <option>5</option>
+                    <option>6</option>
+                    <option>7</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Статус доступности</label>
+                <select name="status" class="form-select">
+                    <option value="free" selected>Доступна</option>
+                    <option value="busy">Занята</option>
+                    <option value="repair">На ремонте</option>
+                </select>
+            </div>
+
+            <div class="form-footer">
+                <button type="button" class="form-btn btn-cancel">Отмена</button>
+                <button type="submit" class="form-btn btn-save">Сохранить аудиторию</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<!-- Модальное окно редактирования -->
+<div class="modal-overlay" id="auditorium-modal-edit">
+    <div class="modal-content">
+        <form method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="id" id="edit-room-id">
+
+            <div class="modal-header">
+                <h3 class="modal-title">Редактировать аудиторию</h3>
+                <button type="button" class="close-btn">&times;</button>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Номер аудитории</label>
+                <input type="text" name="number_room" id="edit-room-number" class="form-input" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Этаж</label>
+                <select name="floor" id="edit-room-floor" class="form-select">
+                    <option>3</option>
+                    <option>4</option>
+                    <option>5</option>
+                    <option>6</option>
+                    <option>7</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Статус доступности</label>
+                <select name="status" id="edit-room-status" class="form-select">
+                    <option value="free">Доступна</option>
+                    <option value="busy">Занята</option>
+                    <option value="repair">На ремонте</option>
+                </select>
+            </div>
+
+            <div class="form-footer">
+                <button type="button" class="form-btn btn-cancel">Отмена</button>
+                <button type="submit" class="form-btn btn-save">Сохранить изменения</button>
+            </div>
+        </form>
+    </div>
+</div>
+<!-- Модальное окно подтверждения удаления -->
+<div class="modal-overlay" id="delete-modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 class="modal-title">Подтверждение удаления</h3>
+      <button type="button" class="close-btn">&times;</button>
+    </div>
+
+    <div class="modal-body">
+      <p>Вы уверены, что хотите удалить эту аудиторию?</p>
+    </div>
+
+    <div class="form-footer">
+      <button type="button" class="form-btn btn-cancel">Отмена</button>
+      <button type="button" class="form-btn btn-save" id="confirm-delete-btn">Удалить</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- Модалка для просмотра информации об аудитории -->
+<div class="modal-overlay" id="view-modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 class="modal-title">Информация об аудитории</h3>
+      <button type="button" class="close-btn" data-close="view-modal">&times;</button>
+    </div>
+
+    <div class="modal-body">
+      <p><strong>Номер:</strong> <span id="view-room-number"></span></p>
+      <p><strong>Этаж:</strong> <span id="view-room-floor"></span></p>
+      <p><strong>Статус:</strong> <span id="view-room-status"></span></p>
+    </div>
+
+    <div class="form-footer">
+      <button type="button" class="form-btn btn-cancel" data-close="view-modal">Закрыть</button>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  initAdminCab();
+  initSearchAndPagination();
+  attachClassroomView();
+});
+
+/* ==========================================================
+   🧱 ОСНОВНЫЕ ФУНКЦИИ (добавление, редактирование, удаление)
+========================================================== */
+function initAdminCab() {
+  const addModal = document.getElementById('auditorium-modal-add');
+  const editModal = document.getElementById('auditorium-modal-edit');
+  const deleteModal = document.getElementById('delete-modal');
+  let deleteId = null;
+
+  // Кнопка "Добавить"
+  document.getElementById('add-auditorium-btn')?.addEventListener('click', () => {
+    addModal.classList.add('active');
+  });
+
+  // ---- EDIT ----
+  document.querySelectorAll('.edit-auditorium-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      document.getElementById('edit-room-id').value = this.dataset.id;
+      document.getElementById('edit-room-number').value = this.dataset.number;
+      document.getElementById('edit-room-floor').value = this.dataset.floor;
+      document.getElementById('edit-room-status').value = this.dataset.status;
+      editModal.classList.add('active');
+    });
+  });
+
+  // ---- DELETE ----
+  document.querySelectorAll('.delete-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      deleteId = this.dataset.id;
+      deleteModal.classList.add('active');
+    });
+  });
+
+  // Подтверждение удаления
+  document.getElementById('confirm-delete-btn')?.addEventListener('click', async () => {
+    if (!deleteId) return;
+    const resp = await fetch(`/auditoriums/delete/${deleteId}/`, {
+      method: "POST",
+      headers: {
+        "X-CSRFToken": document.querySelector('[name=csrfmiddlewaretoken]').value,
+        "X-Requested-With": "XMLHttpRequest"
+      }
+    });
+    if (resp.ok) {
+      document.querySelector(`tr[data-id="${deleteId}"]`)?.remove();
+    } else {
+      alert("Ошибка при удалении!");
+    }
+    deleteModal.classList.remove('active');
+    deleteId = null;
+  });
+
+  // ---- Закрытие всех модалок (универсально) ----
+  document.querySelectorAll(".modal-overlay").forEach(modal => {
+    modal.addEventListener("click", e => {
+      if (e.target.classList.contains("modal-overlay")) {
+        modal.classList.remove("active");
+      }
+    });
+  });
+
+  document.querySelectorAll(".close-btn, .btn-cancel").forEach(btn => {
+    btn.addEventListener("click", () => {
+      btn.closest(".modal-overlay")?.classList.remove("active");
+    });
+  });
+}
+
+/* ==========================================================
+   🔍 ПОИСК + ПАГИНАЦИЯ (AJAX)
+========================================================== */
+function initSearchAndPagination() {
+  const searchInput = document.querySelector(".search-section .search-input");
+
+  async function updateCabTable(url) {
+    try {
+      const res = await fetch(url, { headers: { "X-Requested-With": "XMLHttpRequest" } });
+      const data = await res.json();
+
+      const tableBody = document.querySelector("#cab-table-container");
+      const paginator = document.querySelector("#paginator-container");
+
+      if (tableBody) tableBody.innerHTML = data.table_html;
+      if (paginator) paginator.innerHTML = data.paginator_html;
+
+      initAdminCab();
+      attachClassroomView();
+    } catch (err) {
+      console.error("Ошибка обновления таблицы:", err);
+    }
+  }
+
+  if (searchInput) {
+    let debounceTimer;
+    searchInput.addEventListener("input", () => {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        const query = searchInput.value.trim();
+        const url = new URL(window.location.href);
+        if (query) url.searchParams.set("search", query);
+        else url.searchParams.delete("search");
+        url.searchParams.delete("page");
+        updateCabTable(url);
+      }, 400);
+    });
+  }
+
+  document.addEventListener("click", e => {
+    const btn = e.target.closest(".page-btn");
+    if (btn) {
+      e.preventDefault();
+      const page = btn.dataset.page;
+      const url = new URL(window.location.href);
+      url.searchParams.set("page", page);
+      updateCabTable(url);
+    }
+  });
+}
+
+/* ==========================================================
+   🏫 ПРОСМОТР АУДИТОРИИ (карточки)
+========================================================== */
+function attachClassroomView() {
+  const classrooms = document.querySelectorAll(".classroom");
+  const viewModal = document.getElementById("view-modal");
+
+  classrooms.forEach(room => {
+    room.addEventListener("click", () => {
+      const number = room.dataset.number;
+      const floor = room.closest(".floor-section")?.querySelector(".floor-header")?.textContent.trim() || "—";
+      const status = room.dataset.status === "busy" ? "Занята" : "Свободна";
+
+      document.getElementById("view-room-number").textContent = number;
+      document.getElementById("view-room-floor").textContent = floor.replace("Этаж", "").trim();
+      document.getElementById("view-room-status").textContent = status;
+
+      viewModal.classList.add("active");
+    });
+  });
+}
+</script>
+
+
+{% endblock %}

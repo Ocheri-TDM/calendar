@@ -1,0 +1,41 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="filename" content="colorful_admin_schedule.html">
+    <title>INTC</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/header.css' %}">
+</head>
+<body>
+    <!-- Яркая шапка администратора -->
+    <header class="admin-header">
+        <div class="logo">
+            <i class="fas fa-calendar-alt"></i>
+            <h1>Расписание занятий</h1>
+        </div>
+        <div class="admin-controls">
+            <div class="notification-btn">
+                <i class="fas fa-bell"></i>
+                <div class="notification-badge">3</div>
+            </div>
+            <div class="admin-user">
+                <div class="user-avatar">АД</div>
+                <div class="user-info">
+                    <div class="user-name">Администратор</div>
+                    <div class="user-role">Администратор</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+{% block content %}
+    
+{% endblock %}
+
+</body>
+</html>

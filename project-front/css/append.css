@@ -1,0 +1,80 @@
+:root {
+            --primary-dark: #2980B9;
+            --primary: #4361ee;
+            --secondary: #3a0ca3;
+            --accent: #4cc9f0;
+            --light-blue: #f0f7ff;
+            --success: #4caf50;
+            --warning: #ffb703;
+            --alert: #e63946;
+            --light: #f8f9fa;
+            --gray: #95a5a6;
+            --border: #cbd5e1;
+            --header-height: 80px;
+            --sidebar-width: 280px;
+            --transition: all 0.3s ease;
+            --card-bg: #ffffff;
+            --sidebar-bg: #ffffff;
+            --main-bg: #f5f7ff;
+}
+.toolbar-btn {
+    padding: 12px 20px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: none;
+    font-family: 'Montserrat', sans-serif;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    font-size: 1rem;
+}
+.btn-main {
+    background: linear-gradient(to right, var(--primary), var(--secondary));
+    color: white;
+}
+        
+.btn-main:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 15px rgba(67, 97, 238, 0.35);
+}
+.filter-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--accent), #90e0ef);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+        }
+.filter-icon-2 {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--success), #90e0ef);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+        }
+.filter-icon-3 {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--warning), #90e0ef);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+.pagination button.active {
+            background: linear-gradient(135deg, var(--primary), #90e0ef);
+            color: white;
+        }
