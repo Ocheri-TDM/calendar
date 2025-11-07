@@ -16,8 +16,8 @@ class Teacher(models.Model):
 
 class Group(models.Model):
     SHIFT_CHOICES = (
-        (1, "Первая смена (дневная)"),
-        (2, "Вторая смена (послеобеденная)"),
+        (1, "Первая смена"),
+        (2, "Вторая смена"),
     )
 
     COURSE_CHOICES = (

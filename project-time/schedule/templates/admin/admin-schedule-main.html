@@ -547,50 +547,106 @@ document.addEventListener("DOMContentLoaded", () => {
   // 🔹 Подсветка текущей пары (с учётом вторника и смены)
   // ==========================
   function highlightCurrentLesson() {
-  const now = new Date();
-  const currentHours = now.getHours();
-  const currentMinutes = now.getMinutes();
-  const currentTime = currentHours * 60 + currentMinutes;
+    const now = new Date();
+    const currentHours = now.getHours();
+    const currentMinutes = now.getMinutes();
+    const currentTime = currentHours * 60 + currentMinutes;
 
-  // Определяем день недели (1 = понедельник, 2 = вторник, ... 7 = воскресенье)
-  const today = now.getDay();
-  const weekday = today === 0 ? 7 : today; // Приводим к 1–7
+    // Определяем день недели (1 = понедельник, 2 = вторник, ... 7 = воскресенье)
+    const today = now.getDay();
+    const weekday = today === 0 ? 7 : today; // Приводим к 1–7
 
-  // Берём выбранную смену
-  const shift = parseInt(sessionStorage.getItem("selectedShift") || 1);
+    // Берём выбранную смену
+    const shift = parseInt(sessionStorage.getItem("selectedShift") || 1);
 
-  // Снимаем подсветку со всех
-  document.querySelectorAll(".current-lesson").forEach(el => {
-    el.classList.remove("current-lesson");
-  });
+    // Снимаем подсветку со всех
+    document.querySelectorAll(".current-lesson").forEach(el => {
+      el.classList.remove("current-lesson");
+    });
 
-  // Находим колонку текущего дня
-  const todayColumn = document.querySelector(`.schedule-col[data-weekday='${weekday}']`);
-  if (!todayColumn) return; // если расписания на этот день нет — выходим
+    // Находим колонку текущего дня
+    const todayColumn = document.querySelector(`.schedule-col[data-weekday='${weekday}']`);
+    if (!todayColumn) return; // если расписания на этот день нет — выходим
 
-  // Проверяем все карточки внутри этого дня
-  todayColumn.querySelectorAll(".admin-class-card").forEach(card => {
-    const timeText = card.querySelector(".admin-class-time")?.textContent;
-    if (!timeText) return;
+    // Проверяем все карточки внутри этого дня
+    todayColumn.querySelectorAll(".admin-class-card").forEach(card => {
+      const timeText = card.querySelector(".admin-class-time")?.textContent;
+      if (!timeText) return;
 
-    const match = timeText.match(/(\d{1,2}):(\d{2})\s*[-–]\s*(\d{1,2}):(\d{2})/);
-    if (!match) return;
+      const match = timeText.match(/(\d{1,2}):(\d{2})\s*[-–]\s*(\d{1,2}):(\d{2})/);
+      if (!match) return;
 
-    const [ , sh, sm, eh, em ] = match.map(Number);
-    const start = sh * 60 + sm;
-    const end = eh * 60 + em;
+      const [ , sh, sm, eh, em ] = match.map(Number);
+      const start = sh * 60 + sm;
+      const end = eh * 60 + em;
 
-    if (currentTime >= start && currentTime <= end) {
-      card.classList.add("current-lesson");
-    }
-  });
-}
+      if (currentTime >= start && currentTime <= end) {
+        card.classList.add("current-lesson");
+      }
+    });
+  }
 
-// ⚡ Сразу вызываем при загрузке
-document.addEventListener("DOMContentLoaded", highlightCurrentLesson);
+  // ⚡ Сразу вызываем при загрузке
+  document.addEventListener("DOMContentLoaded", highlightCurrentLesson);
 
-// ⚙️ Обновляем каждые 10 минут
-setInterval(highlightCurrentLesson, 30000);
+  // ⚙️ Обновляем каждые 10 минут
+  setInterval(highlightCurrentLesson, 30000);
+
+
+
+  function adjustTuesdayTimesVisual() {
+    const shift = parseInt(sessionStorage.getItem("selectedShift") || 1);
+
+    // Находим все карточки вторника
+    const tuesdayCol = document.querySelector(".schedule-col[data-weekday='2']");
+    if (!tuesdayCol) return;
+
+    const cards = tuesdayCol.querySelectorAll(".admin-class-card");
+
+    cards.forEach(card => {
+      const subject = (card.querySelector(".admin-subject-name")?.textContent || "").trim();
+      const timeDiv = card.querySelector(".admin-class-time");
+      if (!timeDiv) return;
+
+      // 🔹 Кураторский час
+      if (/кураторский/i.test(subject)) {
+        timeDiv.textContent = shift === 2 ? "13:00 - 13:25" : "08:00 - 08:25";
+        return;
+      }
+
+      // 🔹 Остальные пары — начинаются позже кураторского
+      const info = card.querySelector(".admin-room-info-2")?.textContent || "";
+      const numMatch = info.match(/(\d+)/);
+      if (!numMatch) return;
+
+      const lessonNum = parseInt(numMatch[1]);
+
+      // Список правильных времён вторника
+      const shiftTimes = {
+        1: ["08:30 - 09:50", "10:00 - 11:20", "11:30 - 12:50", "13:00 - 14:20"],
+        2: ["13:30 - 14:50", "15:00 - 16:20", "16:30 - 17:50", "18:00 - 19:20"]
+      };
+
+      if (lessonNum >= 1 && lessonNum <= 4) {
+        timeDiv.textContent = shiftTimes[shift][lessonNum - 1];
+      }
+    });
+  }
+
+  // 🎯 Вызываем после загрузки и после обновления расписания
+  document.addEventListener("DOMContentLoaded", adjustTuesdayTimesVisual);
+
+  // Переопределяем updateSchedule, чтобы обновлять после AJAX-подгрузки
+  if (typeof window.__originalUpdateSchedule === 'undefined') {
+    window.__originalUpdateSchedule = updateSchedule;
+  }
+
+  async function updateScheduleWithVisualFix() {
+    await window.__originalUpdateSchedule();
+    requestAnimationFrame(() => adjustTuesdayTimesVisual());
+  }
+
+  updateSchedule = updateScheduleWithVisualFix;
 
 
   // ==========================
