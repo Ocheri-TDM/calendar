@@ -522,14 +522,7 @@
             transition: all 0.2s;
         }
         
-        .btn-save {
-            background: var(--success);
-            color: white;
-        }
         
-        .btn-save:hover {
-            background: #219653;
-        }
         
         .btn-cancel {
             background: none;
@@ -696,6 +689,9 @@
                 overflow-x: auto;
                 width: 100%;
             }
+            .main-title {
+                font-size: 36px;
+            }
         }
         
         @media (max-width: 768px) {
@@ -727,6 +723,9 @@
                 overflow-x: auto;
                 width: 100%;
             }
+            .main-title {
+                font-size: 28px;
+            }
         }
         
         @media (max-width: 576px) {
@@ -744,6 +743,9 @@
             .notification-btn {
                 width: 40px;
                 height: 40px;
+            }
+            .main-title {
+                font-size: 24px;
             }
         }
 

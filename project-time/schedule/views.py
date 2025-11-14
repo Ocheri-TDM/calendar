@@ -219,7 +219,74 @@ def create_schedule(request):
 
     return JsonResponse({"error": "Метод не разрешен"}, status=405)
 
+@csrf_exempt
+def update_schedule(request, schedule_id):
+    """Редактирование существующей записи расписания"""
+    if request.method != "POST":
+        return JsonResponse({"error": "Метод не разрешен"}, status=405)
 
+    try:
+        data = json.loads(request.body.decode("utf-8"))
+
+        schedule = ClassSchedule.objects.filter(id=schedule_id).first()
+        if not schedule:
+            return JsonResponse({"success": False, "error": "Запись расписания не найдена"}, status=404)
+
+        # Обновляем данные, если они переданы
+        group_id = data.get("group_id")
+        discipline_id = data.get("discipline_id")
+        teacher_id = data.get("teacher_id")
+        weekday = data.get("weekday")
+        lesson_number = data.get("lesson_number")
+        shift = data.get("shift")
+        week_type = data.get("week_type")
+
+        if group_id:
+            schedule.group = Group.objects.get(id=group_id)
+        if discipline_id:
+            schedule.discipline = Discipline.objects.get(id=discipline_id)
+        if teacher_id:
+            schedule.teacher = Teacher.objects.get(id=teacher_id)
+        if weekday:
+            schedule.weekday = int(weekday)
+        if lesson_number:
+            schedule.lesson_number = int(lesson_number)
+        if shift:
+            schedule.shift = int(shift)
+        if week_type:
+            schedule.week_type = week_type
+
+        schedule.save()
+
+        return JsonResponse({
+            "success": True,
+            "message": f"Изменения сохранены ({schedule.group.name_group}, {schedule.discipline.name_dis})"
+        })
+
+    except (Group.DoesNotExist, Discipline.DoesNotExist, Teacher.DoesNotExist) as e:
+        return JsonResponse({"success": False, "error": f"Ошибка данных: {str(e)}"}, status=400)
+    except Exception as e:
+        return JsonResponse({"success": False, "error": str(e)}, status=400)
+
+def get_schedule_details(request, schedule_id):
+    """Возвращает данные конкретной записи для редактирования"""
+    schedule = ClassSchedule.objects.filter(id=schedule_id).select_related("discipline", "teacher", "group").first()
+    if not schedule:
+        return JsonResponse({"error": "Запись не найдена"}, status=404)
+
+    data = {
+        "id": schedule.id,
+        "group": schedule.group.id,
+        "discipline": schedule.discipline.id,
+        "discipline_name": schedule.discipline.name_dis,
+        "teacher": schedule.teacher.id,
+        "teacher_name": f"{schedule.teacher.last_name} {schedule.teacher.first_name[0]}.{schedule.teacher.patronymic[0] if schedule.teacher.patronymic else ''}.",
+        "weekday": schedule.weekday,
+        "lesson_number": schedule.lesson_number,
+        "shift": schedule.shift,
+        "week_type": schedule.week_type,
+    }
+    return JsonResponse(data)
 
 
 # все остальное
@@ -515,7 +582,7 @@ def admin_group(request):
 def admin_teacher(request):
     
     if request.method == "POST":
-        teacher_id = request.POST.get("teacher_id")
+        teacher_id = request.POST.get("teacher_id")  
         if teacher_id:  # если редактируем
             teacher = get_object_or_404(Teacher, id=teacher_id)
             teacher.last_name = request.POST.get("last_name")
@@ -530,6 +597,7 @@ def admin_teacher(request):
 
             teacher.save()
         else:  # если создаём
+            print("FILES:", request.FILES)
             Teacher.objects.create(
                 last_name=request.POST.get("last_name"),
                 first_name=request.POST.get("first_name"),
@@ -554,3 +622,12 @@ def delete_teacher(request, teacher_id):
         except Teacher.DoesNotExist:
             return JsonResponse({"error": "Teacher not found"}, status=404)
     return HttpResponseNotAllowed(["POST"])
+
+
+# -------------------------------------------------------------------------------------------
+# Пользовательская сторона 
+#  ------------------------------------------------------------------------------------------
+
+
+def main(request):
+    return render(request, "users/main.html")

@@ -49,10 +49,10 @@
                     <div class="toolbar-icon">
                         <i class="fas fa-calendar-check"></i>
                     </div>
-                    <h2>Редактирование расписания</h2>
+                    <h2 class="main-title">Редактирование расписания</h2>
                 </div>
                 <div class="toolbar-actions">
-                    <button class="toolbar-btn btn-main">
+                    <button class="toolbar-btn btn-main" id="refresh-btn">
                         <i class="fas fa-sync-alt"></i> Обновить
                     </button>
                 </div>
@@ -424,6 +424,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const btn = e.target.closest(".add-class-btn");
     if (!btn) return;
 
+    
+
+    isEditMode = false;
+    currentLessonId = null;
+
     selectedWeekday = parseInt(btn.dataset.weekday, 10);
     const headerLi = document.querySelector(`.admin-schedule-header li:nth-child(${selectedWeekday})`);
     const span = headerLi?.querySelector("span");
@@ -453,7 +458,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // 🆕 Исправлено: кураторский час блокируется ТОЛЬКО если выбрано время №0
+    // Устанавливаем значение времени только в режиме редактирования
     const timeSelect = document.getElementById("time-select");
+    if (isEditMode && typeof currentLesson !== "undefined" && currentLesson) {
+        timeSelect.value = currentLesson.lesson_number;
+    } else {
+        // В режиме создания просто ставим первую доступную пару
+        timeSelect.selectedIndex = 0;
+    }
     const firstOption = timeSelect?.options[0];
     const selectedTime = parseInt(timeSelect?.value || 1);
 
@@ -482,6 +494,30 @@ document.addEventListener("DOMContentLoaded", () => {
       roomInput.disabled = false;
       timeSelect.disabled = false;
     }
+
+    scheduleModal?.classList.add("active");
+  });
+
+  document.body.addEventListener("click", async (e) => {
+    const editBtn = e.target.closest(".edit-class-btn");
+    if (!editBtn) return;
+
+    // 🟡 Режим редактирования
+    isEditMode = true;
+    currentLessonId = editBtn.dataset.lessonId;
+
+    // Получаем данные занятия (через dataset или fetch)
+    const lessonData = await getLessonData(currentLessonId);
+
+    // Заполняем форму
+    document.getElementById("discipline-search").value = lessonData.discipline_name;
+    document.getElementById("teacher-select").value = lessonData.teacher_id;
+    document.getElementById("time-select").value = lessonData.lesson_number;
+    document.getElementById("room-input").value = lessonData.room;
+    document.getElementById("week-type-select").value = lessonData.week_type;
+
+    document.querySelector(".modal-title").textContent = "Редактировать карточку расписания";
+    document.querySelector(".btn-save").textContent = "Сохранить изменения";
 
     scheduleModal?.classList.add("active");
   });
@@ -649,8 +685,64 @@ document.addEventListener("DOMContentLoaded", () => {
   updateSchedule = updateScheduleWithVisualFix;
 
 
+
   // ==========================
-  // 🔹 Сохранение карточки
+  // 🔹 Редактирование карточки расписания
+  // ==========================
+  document.body.addEventListener("click", async (e) => {
+    const card = e.target.closest(".admin-class-card");
+    if (!card || card.classList.contains("add-card") || card.classList.contains("mentoring-card")) return;
+
+    const id = card.dataset.lessonId;
+    if (id) {
+      isEditMode = true;
+      currentLessonId = id;
+    } else {
+      isEditMode = false;
+      currentLessonId = null;
+    }
+
+    scheduleModal.classList.add("active");
+    const modalTitle = scheduleModal.querySelector(".modal-title");
+    modalTitle.textContent = "Редактирование занятия";
+    saveBtn.textContent = "Сохранить изменения";
+
+    // Извлекаем данные из карточки
+    const subject = card.querySelector(".admin-subject-name")?.textContent.trim() || "";
+    const teacherFull = card.querySelector(".admin-teacher-name")?.textContent.trim() || "";
+    const room = card.querySelector(".admin-room-info")?.textContent.replace(/[^0-9]+/g, "") || "";
+    const lessonNumber = card.querySelector(".admin-room-info-2")?.textContent.match(/\d+/)?.[0] || "1";
+
+    disciplineSearch.value = subject;
+    roomInput.value = room;
+    document.getElementById("time-select").value = lessonNumber;
+
+    // Загружаем дисциплину и преподавателей
+    const res = await fetch(`/search-discipline/?q=${encodeURIComponent(subject)}`);
+    const data = await res.json();
+
+    if (Array.isArray(data) && data.length > 0) {
+      const dis = data[0];
+      selectedDisciplineId = dis.id; // ✅ теперь ID дисциплины сохранится корректно
+
+      const det = await fetch(`/get-discipline-details/${dis.id}/`);
+      const detData = await det.json();
+
+      teacherSelect.innerHTML = `<option disabled selected>Выберите преподавателя</option>`;
+      if (Array.isArray(detData.teachers)) {
+        detData.teachers.forEach(t => {
+          const opt = document.createElement("option");
+          opt.value = t.id;
+          opt.textContent = t.name;
+          teacherSelect.appendChild(opt);
+          if (teacherFull.includes(t.name)) teacherSelect.value = t.id;
+        });
+      }
+    }
+  });
+
+  // ==========================
+  // 🔹 Сохранение карточки (дополнено режимом редактирования)
   // ==========================
   if (saveBtn) {
     saveBtn.addEventListener("click", async () => {
@@ -663,16 +755,21 @@ document.addEventListener("DOMContentLoaded", () => {
       const date = document.getElementById("lesson-date")?.value;
 
       if (!group_id) return alert("⚠️ Выберите группу!");
-      if (!discipline_id || !teacher_id || !selectedWeekday || !lesson_number)
-        return alert("⚠️ Заполните все поля!");
+      if (!discipline_id) return alert("⚠️ Не выбрана дисциплина!");
+      if (!teacher_id || !lesson_number) return alert("⚠️ Заполните все поля!");
 
       saveBtn.disabled = true;
       saveBtn.textContent = "Сохраняем...";
 
-      const payload = { group_id, shift, week_type, discipline_id, teacher_id, weekday: selectedWeekday, lesson_number, date };
-
+      const payload = { group_id, shift, week_type, discipline_id, teacher_id, lesson_number, date, weekday: selectedWeekday};
+      console.log("Payload:", payload);
+      
       try {
-        const res = await fetch("/create-schedule/", {
+        const url = (isEditMode && currentLessonId)
+          ? `/update-schedule/${encodeURIComponent(currentLessonId)}/`
+          : `/create-schedule/`;
+
+        const res = await fetch(url, {
           method: "POST",
           headers: { "Content-Type": "application/json", "X-CSRFToken": getCSRFToken() },
           body: JSON.stringify(payload)
@@ -680,7 +777,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const result = await res.json();
 
         if (result.success) {
-          alert(`✅ ${result.message}`);
+          alert(isEditMode ? "✅ Изменения сохранены!" : "✅ Занятие добавлено!");
           scheduleModal.classList.remove("active");
           await updateSchedule();
         } else {
@@ -691,7 +788,9 @@ document.addEventListener("DOMContentLoaded", () => {
         alert("❌ Сетевая ошибка: " + err.message);
       } finally {
         saveBtn.disabled = false;
-        saveBtn.textContent = "Сохранить";
+        saveBtn.textContent = isEditMode ? "Сохранить изменения" : "Сохранить";
+        isEditMode = false;
+        currentLessonId = null;
       }
     });
   }
@@ -700,7 +799,11 @@ document.addEventListener("DOMContentLoaded", () => {
 </script>
 
 
-
+<script>
+document.getElementById("refresh-btn")?.addEventListener("click", () => {
+    location.reload();
+});
+</script>
 
 
 

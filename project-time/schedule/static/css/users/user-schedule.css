@@ -1,0 +1,416 @@
+        :root {
+            --primary-blue: #4361ee;
+            --dark-blue: #3a0ca3;
+            --light-blue: #e2e6ff;
+            --accent-blue: #260355;
+            --light-gray: #f7f9fc;
+            --text-dark: #333;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7ff, #eef2ff);
+            color: var(--text-dark);
+            min-height: 100vh;
+            padding: 2rem;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+        
+        .schedule-container {
+            max-width: 1440px;
+            width: 100%;
+            min-height: 90vh;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(59, 11, 163, 0.12);
+            overflow: hidden;
+            padding: 1.6rem 2rem;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.8rem;
+            flex-wrap: wrap;
+        }
+        
+        .header h1 {
+            color: var(--dark-blue);
+            font-size: 2.2rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+        
+        .header-info {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .date-selector {
+            display: flex;
+            gap: 0.8rem;
+            align-items: center;
+            padding: 0.5rem 0.8rem;
+            background: var(--light-blue);
+            border-radius: 12px;
+            font-weight: 500;
+        }
+        
+        .current-week {
+            background: var(--primary-blue);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+        
+        /* Фильтры */
+        .filters {
+            background: var(--light-gray);
+            padding: 1.2rem;
+            border-radius: 15px;
+            margin-bottom: 1.8rem;
+        }
+        
+        .filters h3 {
+            font-size: 1.2rem;
+            color: var(--dark-blue);
+            margin-bottom: 1rem;
+        }
+        
+        .filter-row {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .filter-group label {
+            display: block;
+            margin-bottom: 0.6rem;
+            font-weight: 500;
+        }
+        
+        .filter-select {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border-radius: 12px;
+            border: 2px solid #dee2f4;
+            background: white;
+            font-size: 1rem;
+            color: var(--dark-blue);
+            transition: all 0.25s ease;
+            cursor: pointer;
+        }
+        
+        .filter-select:focus {
+            border-color: var(--primary-blue);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.2);
+        }
+        
+        /* Расписание */
+        .schedule-scroll {
+            overflow-x: auto;
+        }
+        .schedule-scroll {
+            overflow-x: auto;
+            scroll-behavior: smooth;
+            padding-bottom: 8px;
+        }
+
+        /* Desktop scrollbar */
+        .schedule-scroll::-webkit-scrollbar {
+            height: 10px;
+            background: var(--light-blue);
+            border-radius: 10px;
+        }
+
+        /* Scroll thumb (ползунок) */
+        .schedule-scroll::-webkit-scrollbar-thumb {
+            background: linear-gradient(45deg, var(--primary-blue), var(--dark-blue));
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        /* Hover эффект */
+        .schedule-scroll::-webkit-scrollbar-thumb:hover {
+            background: var(--dark-blue);
+            transform: scaleY(1.2);
+            cursor: grab;
+        }
+
+        /* Active state (когда тянут скролл) */
+        .schedule-scroll::-webkit-scrollbar-thumb:active {
+            background: var(--primary-blue);
+            cursor: grabbing;
+        }
+        
+        .schedule-header {
+            display: flex;
+            border-radius: 15px;
+            overflow: hidden;
+            min-width: 1160px;
+            box-shadow: 0 4px 12px rgba(0, 0, 30, 0.05);
+        }
+        
+        .day-header {
+            flex: 1;
+            min-width: 210px;
+            background: var(--primary-blue);
+            color: white;
+            padding: 1.2rem;
+            text-align: center;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .day-header.active {
+            background: var(--dark-blue);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(58, 12, 163, 0.3);
+        }
+        
+        .day-header h3 {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .day-header span {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        .schedule-body {
+            display: flex;
+            gap: 1.5rem;
+            padding-bottom: 1.5rem;
+            margin-top: 1rem;
+        }
+        
+        .schedule-col {
+            flex: 1;
+            min-width: 210px;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .class-slot {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 30, 0.05);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .class-slot:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(58, 12, 163, 0.15);
+            border-color: rgba(67, 97, 238, 0.3);
+        }
+        
+        .class-card {
+            padding: 1.2rem;
+            position: relative;
+        }
+        
+        .lecture-type {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 0.3rem 0.8rem;
+            border-radius: 8px;
+            background: var(--light-blue);
+            color: var(--dark-blue);
+        }
+        
+        .subject-name {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--dark-blue);
+            margin-bottom: 0.6rem;
+            padding-right: 2rem;
+        }
+        
+        .class-time {
+            display: inline-block;
+            font-size: 0.9rem;
+            font-weight: 600;
+            background: linear-gradient(45deg, var(--primary-blue), var(--dark-blue));
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 8px;
+            margin-bottom: 0.8rem;
+        }
+        
+        .teacher-name, .room-info {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-size: 0.95rem;
+            margin-bottom: 0.6rem;
+            color: #555;
+        }
+        
+        .fa-icon {
+            width: 20px;
+            text-align: center;
+            color: var(--primary-blue);
+        }
+        
+        .class-slot:nth-child(2n) {
+            background: linear-gradient(to right, #f8fbff, white);
+        }
+        
+        .empty-slot {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 120px;
+            background: #fafcff;
+            border: 2px dashed #dee2f4;
+            border-radius: 15px;
+            color: #8792a7;
+            font-weight: 500;
+        }
+        
+        .slot-count {
+            font-size: 0.9rem;
+            color: #777;
+            font-weight: 600;
+            margin-top: 0.6rem;
+        }
+        
+        footer {
+            margin-top: 2rem;
+            text-align: center;
+            padding: 1.2rem;
+            color: #777;
+            font-size: 0.9rem;
+            border-top: 1px solid #eee;
+        }
+        
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 0.6rem;
+            flex-wrap: wrap;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+
+font-size: 0.85rem;
+        }
+        .legend-item span{
+            font-size: 24px;
+        }
+        
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+        }
+        
+        .legend-lecture { background: var(--light-blue); }
+        .legend-lab { background: #f0f9ff; }
+        
+        #week-select, #shift-select, #group-select{
+            
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+           
+        }
+
+        /* @media (max-width: 900px) {
+            .schedule-body {
+                flex-wrap: wrap;
+                gap: 1.2rem;
+            }
+            
+            .schedule-header {
+                display: none;
+            }
+            
+            .schedule-col {
+                min-width: 100%;
+                border-bottom: 1px solid #eee;
+                padding-bottom: 1rem;
+            }
+            
+            .schedule-col h3 {
+                color: var(--dark-blue);
+                margin-bottom: 1rem;
+                padding-bottom: 0.5rem;
+                border-bottom: 2px solid var(--light-blue);
+            }
+        } */
+        @media (max-width: 850px) {
+            body{
+                padding: 0px;
+            }
+            .header h1 {
+                font-size: 28px;
+                color: var(--light-gray);
+                padding-left: 10px;
+                margin-bottom: 10px;
+            }
+            .day-header {
+                padding: 14px
+            }
+            .schedule-container {
+                padding: 1.6rem 1.6rem;
+                background-color: var(--accent-blue);
+                border-radius: 0px;
+            }
+            .schedule-scroll {
+                background-color: var(--light-blue);
+                border-radius: 15px;
+            }
+        }
+        @media (max-width: 650px) {
+            body{
+                padding: 0px;
+            }
+            .header h1 {
+                font-size: 28px;
+                padding-left: 10px;
+                margin-bottom: 10px;
+            }
+            .day-header {
+                padding: 14px
+            }
+            .schedule-container {
+                padding: 1.6rem 1.2rem;
+            }
+        }

@@ -6,8 +6,8 @@
 
         {# ✅ Если вторник — автоматически вставляем кураторский час перед парами #}
         {% if weekday == 2 %}
-        <li class="admin-class-slot">
-            <div class="admin-class-card mentoring-card">
+        <li class="admin-class-slot ">
+            <div class="admin-class-card mentoring-card edit-class-btn">
                 <div class="admin-subject-name">Кураторский час</div>
                 
                 {# Время зависит от смены #}
@@ -39,7 +39,7 @@
         {# 🔹 Обычные пары #}
         {% for lesson in lessons %}
             <li class="admin-class-slot">
-                <div class="admin-class-card">
+                <div class="admin-class-card edit-class-btn" data-lesson-id="{{ lesson.id }}">
                     <div class="admin-subject-name">{{ lesson.discipline.name_dis }}</div>
                     <div class="admin-class-time">
                         {{ lesson.start_time|time:"H:i" }} - {{ lesson.end_time|time:"H:i" }}

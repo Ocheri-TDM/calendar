@@ -410,24 +410,6 @@
             transition: all 0.2s;
         }
         
-        .btn-save {
-            background: var(--success);
-            color: white;
-        }
-        
-        .btn-save:hover {
-            background: #219653;
-        }
-        
-        .btn-cancel {
-            background: none;
-            border: 1px solid var(--border);
-            color: var(--gray);
-        }
-        
-        .btn-cancel:hover {
-            background: #f9f9f9;
-        }
         
         /* Адаптивность */
         @media (max-width: 1300px) {

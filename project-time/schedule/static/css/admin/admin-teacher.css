@@ -594,14 +594,6 @@
             transition: all 0.2s;
         }
         
-        .btn-save {
-            background: var(--success);
-            color: white;
-        }
-        
-        .btn-save:hover {
-            background: #219653;
-        }
         
         .btn-cancel {
             background: none;

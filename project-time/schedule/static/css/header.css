@@ -217,6 +217,39 @@
         }
 
 
+        .btn-save {
+            background: linear-gradient(30deg, rgba(42, 155, 63, 1) 0%, rgba(76, 175, 80, 1) 32%, rgba(83, 237, 114, 1) 65%);
+            background-size: 200% 200%; /* увеличиваем для движения */
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.3s ease;
+            border-radius: 6px;
+            
+            /* анимация движения градиента */
+            animation: gradientMove 3s ease infinite;
+        }
+
+        .btn-save:hover {
+            transform: scale(1.05); /* лёгкое увеличение при наведении */
+        }
+
+        /* ключевые кадры анимации */
+        @keyframes gradientMove {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+
  /* Адаптивность */
         @media (max-width: 1300px) {
             .filters {
