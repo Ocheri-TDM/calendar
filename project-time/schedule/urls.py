@@ -4,12 +4,14 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
+    # views for admin
     path("admin-schedule", views.admin_schedule, name="admin-schedule"),
     path("search-discipline/", views.search_discipline, name="search_discipline"),
     path("get-discipline-details/<int:discipline_id>/", views.get_discipline_details, name="get_discipline_details"),
     path("api/groups/", views.get_groups_by_shift, name="api_groups_by_shift"),
     
     path("create-schedule/", views.create_schedule, name="create_schedule"),
+    path("delete-schedule/<int:lesson_id>/", views.delete_schedule),
     path("get-schedule-details/<int:schedule_id>/", views.get_schedule_details, name="get-schedule-details"),
     path("update-schedule/<int:schedule_id>/", views.update_schedule, name="update-schedule"),
 
@@ -29,5 +31,8 @@ urlpatterns = [
     path("delete-teacher/<int:teacher_id>/", views.delete_teacher, name="delete_teacher"),
 
     path('admin-group', views.admin_group, name='admin-group'),
+
+    # user view
     path('', views.main, name='main'),
+    path("api/schedule/", views.get_schedule, name="api_schedule"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

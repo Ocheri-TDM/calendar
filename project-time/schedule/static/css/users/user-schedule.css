@@ -209,6 +209,16 @@
             padding-bottom: 1.5rem;
             margin-top: 1rem;
         }
+
+        .schedule-body {
+            opacity: 0;
+            transition: opacity .25s ease;
+        }
+
+        .schedule-body[style*="flex"] {
+            opacity: 1;
+            margin-left: 5px;
+        }
         
         .schedule-col {
             flex: 1;
@@ -225,11 +235,12 @@
             box-shadow: 0 5px 15px rgba(0, 0, 30, 0.05);
             transition: all 0.3s ease;
             border: 2px solid transparent;
+            position: relative;
         }
-        
+
         .class-slot:hover {
             transform: translateY(-5px);
-            box-shadow: 0 12px 25px rgba(58, 12, 163, 0.15);
+            box-shadow: 0 12px 25px rgba(67, 97, 238, 0.15);
             border-color: rgba(67, 97, 238, 0.3);
         }
         
@@ -250,10 +261,18 @@
             color: var(--dark-blue);
         }
         
+        /* Card schedule */
         .subject-name {
             font-size: 1.1rem;
             font-weight: 700;
             color: var(--dark-blue);
+            margin-bottom: 0.6rem;
+            padding-right: 2rem;
+        }
+        .subject-name-g {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #0C7020;
             margin-bottom: 0.6rem;
             padding-right: 2rem;
         }
@@ -268,8 +287,28 @@
             border-radius: 8px;
             margin-bottom: 0.8rem;
         }
+
+        .class-time-g {
+            display: inline-block;
+            font-size: 0.9rem;
+            font-weight: 600;
+            background: linear-gradient(45deg, #3AB795, #0E7C66);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 8px;
+            margin-bottom: 0.8rem;
+        }
         
         .teacher-name, .room-info {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-size: 0.95rem;
+            margin-bottom: 0.6rem;
+            color: #555;
+        }
+
+        .teacher-name-g, .room-info-g {
             display: flex;
             align-items: center;
             gap: 0.6rem;
@@ -283,6 +322,13 @@
             text-align: center;
             color: var(--primary-blue);
         }
+
+        .fa-icon-g {
+            width: 20px;
+            text-align: center;
+            color: #0E7C66;
+        }
+        /* end card */
         
         .class-slot:nth-child(2n) {
             background: linear-gradient(to right, #f8fbff, white);

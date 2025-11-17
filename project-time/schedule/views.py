@@ -219,6 +219,15 @@ def create_schedule(request):
 
     return JsonResponse({"error": "Метод не разрешен"}, status=405)
 
+def delete_schedule(request, lesson_id):
+    if request.method == "POST":
+        try:
+            ClassSchedule.objects.filter(id=lesson_id).delete()
+            return JsonResponse({"success": True})
+        except Exception as e:
+            return JsonResponse({"success": False, "error": str(e)})
+    return JsonResponse({"success": False, "error": "Invalid request"})
+
 @csrf_exempt
 def update_schedule(request, schedule_id):
     """Редактирование существующей записи расписания"""
@@ -630,4 +639,44 @@ def delete_teacher(request, teacher_id):
 
 
 def main(request):
-    return render(request, "users/main.html")
+    groups = Group.objects.all()
+    # В будущем здесь можно будет фильтровать по группе, смене и т.д.
+    schedules = ClassSchedule.objects.select_related(
+        "discipline", "teacher", "classroom", "group"
+    ).order_by("weekday", "lesson_number")
+
+    # Готовим структуру: {1: [...], 2: [...], 3: [...], ...}
+    schedule_by_days = {day: [] for day, _ in ClassSchedule.WEEKDAY_CHOICES}
+
+    for item in schedules:
+        schedule_by_days[item.weekday].append(item)
+
+    return render(request, "users/main.html", {
+        "schedule": schedule_by_days,
+        "groups": groups 
+        })
+
+def get_schedule(request):
+    group_id = request.GET.get("group_id")
+    week_type = request.GET.get("week_type")
+
+    if not group_id:
+        return JsonResponse({"html": ""})
+
+    schedule = ClassSchedule.objects.select_related(
+        "discipline", "teacher", "classroom", "group"
+    ).filter(
+        group_id=group_id,
+        week_type=week_type
+    ).order_by("weekday", "lesson_number")
+
+    schedule_by_days = {day: [] for day, _ in ClassSchedule.WEEKDAY_CHOICES}
+    for item in schedule:
+        schedule_by_days[item.weekday].append(item)
+
+    html = render_to_string(
+        "dinamic-user/user-schedule-main.html",
+        {"schedule": schedule_by_days}
+    )
+
+    return JsonResponse({"html": html})

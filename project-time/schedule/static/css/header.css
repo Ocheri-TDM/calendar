@@ -248,6 +248,43 @@
                 background-position: 0% 50%;
             }
         }
+        
+        .btn-delete {
+            background: linear-gradient(30deg, #b71c1c 0%, #e53935 40%, #ff6f00 75%);
+            background-size: 200% 200%;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: bold;
+            border-radius: 6px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+            /* плавная "живая" анимация, как у сохранения */
+            animation: dangerGlow 3s ease infinite;
+        }
+
+        .btn-delete:hover {
+            transform: scale(1.05);
+            box-shadow: 0px 0px 12px rgba(255, 0, 0, 0.45);
+        }
+
+        .btn-delete:active {
+            transform: scale(0.95);
+        }
+
+        /* 🔄 движение градиента */
+        @keyframes dangerGlow {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
 
 
  /* Адаптивность */

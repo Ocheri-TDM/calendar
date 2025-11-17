@@ -1,4 +1,5 @@
 {% load static %}
+{% load schedule_filters %}
 
 <!DOCTYPE html>
 <html lang="ru">
@@ -31,14 +32,13 @@
                 <div class="filter-group">
                     <label for="group-select">Группа</label>
                     <select id="group-select" class="filter-select">
-                        <option selected>ВТ-502</option>
-                        <option>ИТ-301</option>
-                        <option>ПИ-202</option>
-                        <option>ИСиТ-402</option>
-                        <option>КТ-105</option>
+                        <option value="">Выберите группу</option>
+                        {% for g in groups %}
+                            <option value="{{ g.id }}" data-shift="{{ g.shift }}">{{ g.name_group }}</option>
+                        {% endfor %}
                     </select>
                 </div>
-                
+
                 <div class="filter-group">
                     <label for="week-select">Тип недели</label>
                     <select id="week-select" class="filter-select">
@@ -50,9 +50,9 @@
                 <div class="filter-group">
                     <label for="shift-select">Смена</label>
                     <select id="shift-select" class="filter-select">
-                        <option selected>1 смена</option>
-                        <option>2 смена</option>
-                        <option>Индивидуальное</option>
+                        <option selected value="">Все</option>
+                        <option value="1">1 смена</option>
+                        <option value="2">2 смена</option>
                     </select>
                 </div>
             </div>
@@ -83,252 +83,8 @@
                 </div>
             </div>
             
-            <div class="schedule-body">
-                <!-- Понедельник -->
-                <ul class="schedule-col">
-                    <li class="class-slot">
-                        <div class="class-card">
-                            <div class="subject-name">Программирование и алгоритмы</div>
-                            <div class="class-time">8:30 - 10:00</div>
-                            <div class="teacher-name">
-                                <span class="fa-icon"><i class="fas fa-user-tie"></i></span>
-                                <span>Проф. Петров В.А.</span>
-                            </div>
-                            <div class="room-info">
-                                <span class="fa-icon"><i class="fas fa-building"></i></span>
-                                <span>Аудитория 105 (корпус Б)</span>
-                            </div>
-                            <div class="slot-count">1 пара</div>
-                    </li>
-                    
-                    <li class="class-slot">
-                        <div class="class-card">
-                            <div class="subject-name">Базы данных</div>
-                            <div class="class-time">10:15 - 11:45</div>
-                            <div class="teacher-name">
-                                <span class="fa-icon"><i class="fas fa-user-tie"></i></span>
-                                <span>Доц. Сидорова М.П.</span>
-                            </div>
-                            <div class="room-info">
-                                <span class="fa-icon"><i class="fas fa-laptop-code"></i></span>
-                                <span>Компьютерный класс 207</span>
-                            </div>
-                            <div class="slot-count">2 пара</div>
-                    </li>
-                    
-                    <li class="empty-slot">
-                        <div>Обеденный перерыв</div>
-                    </li>
-                    
-                    <li class="class-slot">
-                        <div class="class-card">
-                            <div class="subject-name">Иностранный язык</div>
-                            <div class="class-time">13:30 - 15:00</div>
-                            <div class="teacher-name">
-                                <span class="fa-icon"><i class="fas fa-user-tie"></i></span>
-                                <span>Проф. Иванова А.К.</span>
-                            </div>
-                            <div class="room-info">
-                                <span class="fa-icon"><i class="fas fa-book-open"></i></span>
-                                <span>Аудитория 310</span>
-                            </div>
-                            <div class="slot-count">3 пара</div>
-                    </li>
-                </ul>
-                
-                <!-- Вторник -->
-                <ul class="schedule-col">
-                    <li class="class-slot">
-                        <div class="class-card">
-                            <div class="subject-name">Теория вероятности</div>
-                            <div class="class-time">9:00 - 10:30</div>
-                            <div class="teacher-name">
-                                <span class="fa-icon"><i class="fas fa-user-tie"></i></span>
-                                <span>Проф. Васильев Д.Н.</span>
-                            </div>
-                            <div class="room-info">
-                                <span class="fa-icon"><i class="fas fa-chalkboard"></i></span>
-                                <span>Аудитория 220</span>
-                            </div>
-                            <div class="slot-count">1 пара</div>
-                    </li>
-                    
-                    <li class="class-slot">
-                        <div class="class-card">
-
-<div class="subject-name">Сетевые технологии</div>
-                            <div class="class-time">10:45 - 12:15</div>
-                            <div class="teacher-name">
-                                <span class="fa-icon"><i class="fas fa-user-tie"></i></span>
-                                <span>Доц. Николаев С.В.</span>
-                            </div>
-                            <div class="room-info">
-                                <span class="fa-icon"><i class="fas fa-network-wired"></i></span>
-                                <span>Лаборатория сетей</span>
-                            </div>
-                            <div class="slot-count">2 пара</div>
-                    </li>
-                    
-                    <li class="empty-slot">
-                        <div>Обеденный перерыв</div>
-                    </li>
-                    
-                    <li class="class-slot">
-                        <div class="class-card">
-                            <div class="subject-name">Программирование</div>
-                            <div class="class-time">13:45 - 15:15</div>
-                            <div class="teacher-name">
-                                <span class="fa-icon"><i class="fas fa-user-tie"></i></span>
-                                <span>Доц. Федорова Е.С.</span>
-                            </div>
-                            <div class="room-info">
-                                <span class="fa-icon"><i class="fas fa-code"></i></span>
-                                <span>Лаб. 312</span>
-                            </div>
-                            <div class="slot-count">3 пара</div>
-                    </li>
-                </ul>
-                
-                <!-- Среда -->
-                <ul class="schedule-col">
-                    <li class="class-slot">
-                        <div class="class-card">
-                            <div class="subject-name">Операционные системы</div>
-                            <div class="class-time">8:30 - 10:00</div>
-                            <div class="teacher-name">
-                                <span class="fa-icon"><i class="fas fa-user-tie"></i></span>
-                                <span>Проф. Козлов П.Л.</span>
-                            </div>
-                            <div class="room-info">
-                                <span class="fa-icon"><i class="fas fa-laptop"></i></span>
-                                <span>Компьютерный класс 125</span>
-                            </div>
-                            <div class="slot-count">1 пара</div>
-                    </li>
-                    
-                    <li class="class-slot">
-                        <div class="class-card">
-                            <div class="subject-name">Архитектура ЭВМ</div>
-                            <div class="class-time">10:15 - 11:45</div>
-                            <div class="teacher-name">
-                                <span class="fa-icon"><i class="fas fa-user-tie"></i></span>
-                                <span>Проф. Степанов А.М.</span>
-                            </div>
-                            <div class="room-info">
-                                <span class="fa-icon"><i class="fas fa-microchip"></i></span>
-                                <span>Аудитория 418</span>
-                            </div>
-                            <div class="slot-count">2 пара</div>
-                    </li>
-                    
-                    <li class="empty-slot">
-                        <div>Обеденный перерыв</div>
-                    </li>
-                    
-                    <li class="class-slot">
-                        <div class="class-card">
-                            <div class="subject-name">Физическая культура</div>
-                            <div class="class-time">13:30 - 15:00</div>
-                            <div class="teacher-name">
-                                <span class="fa-icon"><i class="fas fa-running"></i></span>
-                                <span>Тренер Смирнов О.И.</span>
-                            </div>
-                            <div class="room-info">
-                                <span class="fa-icon"><i class="fas fa-dumbbell"></i></span>
-                                <span>Спортивный зал 2</span>
-                            </div>
-                            <div class="slot-count">3 пара</div>
-                    </li>
-                </ul>
-                
-                <!-- Четверг -->
-                <ul class="schedule-col">
-                    <li class="empty-slot">
-                        <div>Занятий в первой половине дня нет</div>
-                    </li>
-                    
-                    <li class="class-slot">
-                        <div class="class-card">
-                            <div class="subject-name">Дискретная математика</div>
-                            <div class="class-time">13:30 - 15:00</div>
-                            <div class="teacher-name">
-                                <span class="fa-icon"><i class="fas fa-user-tie"></i></span>
-                                <span>Проф. Миронова Л.В.</span>
-                            </div>
-                            <div class="room-info">
-                                <span class="fa-icon"><i class="fas fa-calculator"></i></span>
-                                <span>Аудитория 107</span>
-                            </div>
-                            <div class="slot-count">3 пара</div>
-                    </li>
-                    
-                    <li class="class-slot">
-                        <div class="class-card">
-                            <div class="subject-name">Инженерная графика</div>
-                            <div class="class-time">15:15 - 16:45</div>
-                            <div class="teacher-name">
-                                <span class="fa-icon"><i class="fas fa-user-tie"></i></span>
-                                <span>Доц. Волков С.М.</span>
-                            </div>
-                            <div class="room-info">
-                                <span class="fa-icon"><i class="fas fa-ruler-combined"></i></span>
-                                <span>Лаб. черчения</span>
-                            </div>
-                            <div class="slot-count">4 пара</div>
-                    </li>
-                </ul>
-                
-                <!-- Пятница -->
-                <ul class="schedule-col">
-                    <li class="class-slot">
-                        <div class="class-card">
-                            <div class="subject-name">Теория алгоритмов</div>
-                            <div class="class-time">9:00 - 10:30</div>
-                            <div class="teacher-name">
-                                <span class="fa-icon"><i class="fas fa-user-tie"></i></span>
-                                <span>Проф. Белов А.И.</span>
-                            </div>
-                            <div class="room-info">
-                                <span class="fa-icon"><i class="fas fa-brain"></i></span>
-                                <span>Аудитория 301</span>
-                            </div>
-                            <div class="slot-count">1 пара</div>
-                    </li>
-                    
-                    <li class="class-slot">
-                        <div class="class-card">
-                            <div class="subject-name">Веб-разработка</div>
-                            <div class="class-time">10:45 - 12:15</div>
-                            <div class="teacher-name">
-                                <span class="fa-icon"><i class="fas fa-user-tie"></i></span>
-                                <span>Доц. Кудрявцев П.Р.</span>
-                            </div>
-                            <div class="room-info">
-                                <span class="fa-icon"><i class="fas fa-laptop-code"></i></span>
-                                <span>Компьютерный класс 215</span>
-                            </div>
-                            <div class="slot-count">2 пара</div>
-                    </li>
-                    
-                    <li class="empty-slot">
-                        <div>Обеденный перерыв</div>
-                    </li>
-                    
-                    <li class="class-slot">
-                        <div class="class-card">
-                            <div class="subject-name">Информационная безопасность</div>
-                            <div class="class-time">13:30 - 15:00</div>
-                            <div class="teacher-name">
-                                <span class="fa-icon"><i class="fas fa-user-tie"></i></span>
-                                <span>Проф. Поляков И.Н.</span>
-                            </div>
-                            <div class="room-info">
-                                <span class="fa-icon"><i class="fas fa-shield-alt"></i></span>
-                                <span>Лаборатория 222</span>
-                            </div>
-                            <div class="slot-count">3 пара</div>
-                    </li>
-                </ul>
+            <div id="schedule-wrapper" class="schedule-body" style="display:none;">
+                {% include 'dinamic-user/user-schedule-main.html' %}
             </div>
         </div>
         
@@ -341,7 +97,7 @@
             <p style="margin-top: 1rem">Для изменения отображаемых данных используйте фильтры вверху страницы</p>
         </footer>
     </div>
-
+<!-- Визуал (Можно трогать) -->
     <script>
         // Активация дня недели при клике
         document.querySelectorAll('.day-header').forEach(day => {
@@ -399,5 +155,205 @@
         });
 
     </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const dayHeaders = document.querySelectorAll(".day-header");
+            const weekRangeSpan = document.querySelector(".date-selector span");
+
+            const today = new Date();
+
+            const todayWeekday = today.getDay(); // 0 вс, 1 пн...
+            const monday = new Date(today);
+            const offset = (todayWeekday === 0 ? -6 : 1 - todayWeekday);
+            monday.setDate(today.getDate() + offset);
+
+            function formatDay(date) {
+                return date.toLocaleDateString("ru-RU", {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric'
+                });
+            }
+
+            function formatWeekRange(startDate) {
+                const endDate = new Date(startDate);
+                endDate.setDate(startDate.getDate() + 6);
+
+                // "11 марта — 17 марта 2025 г."
+                return `${startDate.toLocaleDateString("ru-RU", { day: 'numeric', month: 'long' })} — ${
+                    endDate.toLocaleDateString("ru-RU", { day: 'numeric', month: 'long', year: 'numeric' })
+                }`;
+            }
+
+            // ставим диапазон недели в верхний блок
+            if (weekRangeSpan) {
+                weekRangeSpan.textContent = formatWeekRange(monday);
+            }
+
+            dayHeaders.forEach((el, i) => {
+                const date = new Date(monday);
+                date.setDate(monday.getDate() + i);
+
+                el.querySelector("span").textContent = formatDay(date);
+
+                el.classList.remove("active");
+
+                if (i === (todayWeekday === 0 ? 0 : todayWeekday - 1)) {
+                    el.classList.add("active");
+                }
+            });
+        });
+    </script>
+<!-- логика (НЕ ТРОГАТЬ) -->
+    <script>
+    const scheduleContainer = document.querySelector(".schedule-body");
+    const shiftSelect = document.getElementById("shift-select");
+    const groupSelect = document.getElementById("group-select");
+    const weekSelect = document.getElementById("week-select");
+
+    // Времена по сменам
+    const shiftTimes = {
+        1: ["08:30 - 09:50", "10:00 - 11:20", "11:30 - 12:50", "13:00 - 14:20"],
+        2: ["13:30 - 14:50", "15:00 - 16:20", "16:30 - 17:50", "18:00 - 19:20"]
+    };
+
+    // Фильтруем группы по смене
+    function filterGroupsByShift() {
+        const selectedShift = shiftSelect.value; // "" / "1" / "2"
+
+        Array.from(groupSelect.options).forEach(option => {
+            if (!option.value) return; // пропускаем "Выберите группу"
+            const groupShift = option.dataset.shift;
+
+            if (!selectedShift || selectedShift === groupShift) {
+                option.style.display = "block";
+            } else {
+                option.style.display = "none";
+            }
+        });
+
+        if (groupSelect.selectedOptions[0].style.display === "none") {
+            groupSelect.value = "";
+            scheduleContainer.style.display = "none";
+        }
+    }
+
+    // Обновление расписания
+    async function updateSchedule() {
+        const groupId = groupSelect.value;
+        const week = getWeekValue(weekSelect.value);
+
+        if (!groupId) return;
+
+        const response = await fetch(`/api/schedule/?group_id=${groupId}&week_type=${week}`);
+        const data = await response.json();
+
+        scheduleContainer.innerHTML = data.html; // вставляем готовый HTML
+        applyShiftTimes(); // применяем правильные времена
+    }
+
+    // Применяем времена по смене (для вторника)
+    function applyShiftTimes() {
+        const selectedShift = parseInt(groupSelect.selectedOptions[0].dataset.shift, 10);
+        if (!selectedShift) return;
+
+        const tuesdayCol = scheduleContainer.querySelector('ul[data-weekday="2"]');
+        if (!tuesdayCol) return;
+
+        const lessonDivs = Array.from(tuesdayCol.querySelectorAll('.class-card')).filter(
+            div => !div.classList.contains('mentoring-card')
+        );
+
+        lessonDivs.forEach(div => {
+            const timeDiv = div.querySelector('.class-time');
+            const slotNumberEl = div.querySelector('.slot-count');
+
+            if (!timeDiv || !slotNumberEl) return;
+
+            const slotNum = parseInt(slotNumberEl.textContent.replace(/\D/g, ""), 10);
+
+            if (slotNum >= 1 && slotNum <= shiftTimes[selectedShift].length) {
+                timeDiv.textContent = shiftTimes[selectedShift][slotNum - 1];
+            }
+        });
+
+        // Кураторский час
+        const mentoringDiv = tuesdayCol.querySelector('.mentoring-card .class-time');
+        if (mentoringDiv) {
+            mentoringDiv.textContent = selectedShift === 2 ? "13:00 - 13:25" : "08:00 - 08:25";
+        }
+    }
+
+    // События
+    groupSelect.addEventListener("change", () => {
+        if (!groupSelect.value) {
+            scheduleContainer.style.display = "none";
+            sessionStorage.removeItem("selectedGroup");
+            return;
+        }
+
+        sessionStorage.setItem("selectedGroup", groupSelect.value);
+        scheduleContainer.style.display = "flex";
+        updateSchedule();
+    });
+
+    weekSelect.addEventListener("change", updateSchedule);
+    shiftSelect.addEventListener("change", () => {
+        filterGroupsByShift();
+        updateSchedule(); // обновляем расписание при смене смены
+    });
+
+    // восстановление выбора
+    const saved = sessionStorage.getItem("selectedGroup");
+    if (saved) {
+        groupSelect.value = saved;
+        scheduleContainer.style.display = "flex";
+        updateSchedule();
+    }
+
+    // Фильтрация групп по умолчанию при загрузке страницы
+    filterGroupsByShift();
+
+    function getWeekValue(raw) {
+        return raw === "Числитель" ? "numerator" : "denominator";
+    }
+
+    </script>
+    <script>
+document.addEventListener("DOMContentLoaded", () => {
+
+    function highlightCurrentClass() {
+        const now = new Date();
+        const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+        document.querySelectorAll(".class-card").forEach(card => {
+            let timeText = card.dataset.time; // ожидаем "08:30-09:50"
+            if (!timeText) return;
+
+            // убираем пробелы на всякий случай
+            timeText = timeText.replace(/\s/g, '');
+
+            const [startStr, endStr] = timeText.split("-");
+            if (!startStr || !endStr) return;
+
+            const [sh, sm] = startStr.split(":").map(Number);
+            const [eh, em] = endStr.split(":").map(Number);
+
+            const startMinutes = sh * 60 + sm;
+            const endMinutes = eh * 60 + em;
+
+            if (currentMinutes >= startMinutes && currentMinutes <= endMinutes) {
+                card.classList.add("current-class");
+            } else {
+                card.classList.remove("current-class");
+            }
+        });
+    }
+
+    // вызываем сразу и каждые 30 секунд
+    highlightCurrentClass();
+    setInterval(highlightCurrentClass, 30000);
+});
+</script>
 </body>
 </html>

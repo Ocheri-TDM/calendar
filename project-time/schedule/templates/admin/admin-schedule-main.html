@@ -189,6 +189,7 @@
 
     <div class="form-footer">
       <button class="form-btn btn-cancel" id="cancel-schedule">Отмена</button>
+      <button class="form-btn btn-delete hidden" id="delete-schedule">Удалить</button>
       <button class="form-btn btn-save">Сохранить</button>
     </div>
   </div>
@@ -622,12 +623,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // ⚡ Сразу вызываем при загрузке
-  document.addEventListener("DOMContentLoaded", highlightCurrentLesson);
-
-  // ⚙️ Обновляем каждые 10 минут
-  setInterval(highlightCurrentLesson, 30000);
-
 
 
   function adjustTuesdayTimesVisual() {
@@ -712,6 +707,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const teacherFull = card.querySelector(".admin-teacher-name")?.textContent.trim() || "";
     const room = card.querySelector(".admin-room-info")?.textContent.replace(/[^0-9]+/g, "") || "";
     const lessonNumber = card.querySelector(".admin-room-info-2")?.textContent.match(/\d+/)?.[0] || "1";
+    document.querySelector(".btn-save").textContent = "Сохранить изменения";
+    deleteBtn.classList.remove("hidden");
 
     disciplineSearch.value = subject;
     roomInput.value = room;
@@ -753,6 +750,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const teacher_id = teacherSelect?.value;
       const lesson_number = document.getElementById("time-select")?.value;
       const date = document.getElementById("lesson-date")?.value;
+      deleteBtn.classList.add("hidden");
 
       if (!group_id) return alert("⚠️ Выберите группу!");
       if (!discipline_id) return alert("⚠️ Не выбрана дисциплина!");
@@ -794,6 +792,42 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   }
+
+  const deleteBtn = document.getElementById("delete-schedule");
+
+  async function deleteSchedule() {
+    if (!currentLessonId) return alert("Ошибка: нет ID!");
+
+    if (!confirm("❗ Вы уверены, что хотите удалить это занятие?")) return;
+
+    deleteBtn.disabled = true;
+    deleteBtn.textContent = "Удаляем...";
+
+    try {
+      const res = await fetch(`/delete-schedule/${currentLessonId}/`, {
+        method: "POST",
+        headers: { "X-CSRFToken": getCSRFToken() }
+      });
+
+      const result = await res.json();
+
+      if (result.success) {
+        alert("🗑️ Занятие удалено!");
+        scheduleModal.classList.remove("active");
+        await updateSchedule();
+      } else {
+        alert("❌ Ошибка: " + (result.error || "Не удалось удалить"));
+      }
+
+    } catch (err) {
+      alert("❌ Сетевая ошибка: " + err.message);
+    } finally {
+      deleteBtn.disabled = false;
+      deleteBtn.textContent = "Удалить";
+    }
+  }
+
+  if (deleteBtn) deleteBtn.addEventListener("click", deleteSchedule);
 
 });
 </script>
