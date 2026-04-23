@@ -9,7 +9,7 @@ urlpatterns = [
     path("search-discipline/", views.search_discipline, name="search_discipline"),
     path("get-discipline-details/<int:discipline_id>/", views.get_discipline_details, name="get_discipline_details"),
     path("api/groups/", views.get_groups_by_shift, name="api_groups_by_shift"),
-    
+
     path("create-schedule/", views.create_schedule, name="create_schedule"),
     path("delete-schedule/<int:lesson_id>/", views.delete_schedule),
     path("get-schedule-details/<int:schedule_id>/", views.get_schedule_details, name="get-schedule-details"),
@@ -19,20 +19,22 @@ urlpatterns = [
     path("load-schedule-table/", views.load_schedule_table, name="load_schedule_table"),
     path("api/get-group-shift/", views.get_group_shift, name="get-group-shift"),
 
-
-    path('admin-cab', views.admin_cab, name='admin-cab'),
+    path("admin-cab", views.admin_cab, name="admin-cab"),
     path("auditoriums/delete/<int:pk>/", views.delete_auditorium, name="delete_auditorium"),
 
-
-    path('admin-discipline', views.admin_discipline, name='admin-discipline'),
+    path("admin-discipline", views.admin_discipline, name="admin-discipline"),
     path("delete-discipline/<int:pk>/", views.delete_discipline, name="delete_discipline"),
 
-    path('admin-teacher', views.admin_teacher, name='admin-teacher'),
+    path("admin-teacher", views.admin_teacher, name="admin-teacher"),
     path("delete-teacher/<int:teacher_id>/", views.delete_teacher, name="delete_teacher"),
 
-    path('admin-group', views.admin_group, name='admin-group'),
+    path("admin-group", views.admin_group, name="admin-group"),
 
     # user view
-    path('', views.main, name='main'),
+    path("", views.main, name="main"),
     path("api/schedule/", views.get_schedule, name="api_schedule"),
+
+    # new user api
+    path("api/group-state/<int:group_id>/", views.api_group_state, name="api_group_state"),
+    path("api/groups-full/", views.api_groups_full, name="api_groups_full"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

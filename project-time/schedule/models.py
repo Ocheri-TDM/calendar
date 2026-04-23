@@ -5,13 +5,32 @@ class Teacher(models.Model):
     first_name = models.CharField(max_length=50, verbose_name="Имя")
     last_name = models.CharField(max_length=50, verbose_name="Фамилия")
     patronymic = models.CharField(max_length=50, verbose_name="Отчество", blank=True, null=True)
-    phone_number = models.CharField(max_length=20, verbose_name="Телефон")
+    phone_number = models.CharField(max_length=20, verbose_name="Телефон", blank=True, null=True)
     gmail = models.EmailField(max_length=100, verbose_name="Gmail", blank=True, null=True)
     position = models.CharField(max_length=100, verbose_name="Должность", blank=True, null=True)
     photo = models.ImageField(upload_to="teachers/", blank=True, null=True, verbose_name="Фотография")
 
     def __str__(self):
         return f"{self.last_name} {self.first_name} {self.patronymic or ''}".strip()
+
+    class Meta:
+        db_table = "main_teacher"
+        verbose_name = "Преподаватель"
+        verbose_name_plural = "Преподаватели"
+
+
+class Direction(models.Model):
+    name = models.CharField(max_length=100, verbose_name="Название")
+    code = models.CharField(max_length=20, unique=True, verbose_name="Код")
+
+    def __str__(self):
+        return self.code
+
+    class Meta:
+        db_table = "main_direction"
+        verbose_name = "Направление"
+        verbose_name_plural = "Направления"
+
 
 
 class Group(models.Model):
@@ -34,32 +53,47 @@ class Group(models.Model):
         null=True,
         blank=True,
         verbose_name="Куратор",
+        db_column="supervisor_id",
     )
     students_count = models.PositiveIntegerField(default=0, verbose_name="Количество студентов")
-    shift = models.PositiveSmallIntegerField(
-        choices=SHIFT_CHOICES, default=1, verbose_name="Смена"
+    shift = models.PositiveSmallIntegerField(choices=SHIFT_CHOICES, default=1, verbose_name="Смена")
+    course = models.PositiveSmallIntegerField(choices=COURSE_CHOICES, default=1, verbose_name="Курс")
+    direction = models.ForeignKey(
+        Direction,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name="Направление",
+        db_column="direction_id",
     )
-    course = models.PositiveSmallIntegerField(
-        choices=COURSE_CHOICES, default=1, verbose_name="Курс"
-    )  # ✅ Новое поле
 
     def __str__(self):
         return f"{self.name_group} (Смена {self.shift}, Курс {self.course})"
 
+    class Meta:
+        db_table = "main_group"
+        verbose_name = "Группа"
+        verbose_name_plural = "Группы"
 
 
 class Classroom(models.Model):
-    number_room = models.CharField(max_length=10, verbose_name="Номер аудитории")
-    floor = models.PositiveIntegerField(verbose_name="Этаж")
     STATUS_CHOICES = (
-        ('free', 'Доступна'),
-        ('busy', 'Занята'),
-        ('repair', 'На ремонте'),
+        ("free", "Доступна"),
+        ("busy", "Занята"),
+        ("repair", "На ремонте"),
     )
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='free', verbose_name="Статус")
+
+    number_room = models.CharField(max_length=20, verbose_name="Номер аудитории")
+    floor = models.PositiveIntegerField(verbose_name="Этаж", null=True, blank=True)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="free", verbose_name="Статус")
 
     def __str__(self):
-        return f"Аудитория {self.number_room} (Этаж {self.floor})"
+        return f"Аудитория {self.number_room}"
+
+    class Meta:
+        db_table = "main_classroom"
+        verbose_name = "Аудитория"
+        verbose_name_plural = "Аудитории"
 
 
 class Discipline(models.Model):
@@ -74,11 +108,8 @@ class Discipline(models.Model):
         ("inactive", "Неактивный"),
     )
 
-    name_dis = models.CharField(max_length=100, verbose_name="Название дисциплины")
-    name_short = models.CharField(max_length=10, verbose_name="Сокращение", blank=True, null=True)
-    classroom = models.ForeignKey(
-        Classroom, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Аудитория"
-    )
+    name_dis = models.CharField(max_length=255, verbose_name="Название дисциплины")
+    name_short = models.CharField(max_length=50, verbose_name="Сокращение", blank=True, null=True)
     duration_hours = models.PositiveIntegerField(
         verbose_name="Количество часов обучения", null=True, blank=True, default=50
     )
@@ -88,10 +119,77 @@ class Discipline(models.Model):
     status = models.CharField(
         max_length=10, choices=STATUS_CHOICES, default="active", verbose_name="Статус"
     )
-    teachers = models.ManyToManyField(Teacher, related_name="disciplines", verbose_name="Преподаватели")
+
+    teachers = models.ManyToManyField(
+        Teacher,
+        related_name="disciplines",
+        verbose_name="Преподаватели",
+        through="DisciplineTeacherLink",
+        blank=True,
+    )
+
+    classroom = models.ManyToManyField(
+        Classroom,
+        related_name="disciplines",
+        verbose_name="Аудитории",
+        through="DisciplineClassroomLink",
+        blank=True,
+    )
 
     def __str__(self):
         return self.name_dis
+
+    class Meta:
+        db_table = "main_discipline"
+        verbose_name = "Дисциплина"
+        verbose_name_plural = "Дисциплины"
+
+
+class DisciplineTeacherLink(models.Model):
+    discipline = models.ForeignKey(Discipline, on_delete=models.CASCADE, db_column="discipline_id")
+    teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE, db_column="teacher_id")
+
+    class Meta:
+        db_table = "main_discipline_teachers"
+        managed = False
+
+
+class DisciplineClassroomLink(models.Model):
+    discipline = models.ForeignKey(Discipline, on_delete=models.CASCADE, db_column="discipline_id")
+    classroom = models.ForeignKey(Classroom, on_delete=models.CASCADE, db_column="classroom_id")
+
+    class Meta:
+        db_table = "main_discipline_classroom"
+        managed = False
+
+
+class GroupWeekState(models.Model):
+    STATE_CHOICES = (
+        ("theory", "Теория"),
+        ("practice", "Практика"),
+        ("vacation", "Каникулы"),
+        ("holiday", "Праздничная неделя"),
+        ("no_schedule", "Без расписания"),
+    )
+
+    group = models.ForeignKey(Group, on_delete=models.CASCADE, verbose_name="Группа", db_column="group_id")
+    week_number = models.PositiveIntegerField(verbose_name="Номер недели")
+    state = models.CharField(max_length=30, choices=STATE_CHOICES, verbose_name="Состояние")
+    practice_code = models.CharField(max_length=100, blank=True, null=True, verbose_name="Код практики")
+    practice_name = models.CharField(max_length=255, blank=True, null=True, verbose_name="Название практики")
+    cell_value = models.CharField(max_length=100, blank=True, null=True, verbose_name="Значение ячейки")
+    start_date = models.DateField(blank=True, null=True, verbose_name="Начало недели")
+    end_date = models.DateField(blank=True, null=True, verbose_name="Конец недели")
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.group.name_group} | {self.week_number} | {self.state}"
+
+    class Meta:
+        db_table = "main_group_week_state"
+        verbose_name = "Состояние группы на неделю"
+        verbose_name_plural = "Состояния групп на неделю"
+        unique_together = ("group", "week_number")
 
 
 class ClassSchedule(models.Model):
@@ -115,66 +213,77 @@ class ClassSchedule(models.Model):
         (5, "Пятница"),
     )
 
-    SHIFT_CHOICES = (
-        (1, "Первая смена"),
-        (2, "Вторая смена"),
+    group = models.ForeignKey(Group, on_delete=models.CASCADE, verbose_name="Группа", db_column="group_id")
+    discipline = models.ForeignKey(Discipline, on_delete=models.CASCADE, verbose_name="Дисциплина", db_column="discipline_id")
+    teacher = models.ForeignKey(
+        Teacher,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name="Преподаватель",
+        db_column="teacher_id",
+    )
+    classroom = models.ForeignKey(
+        Classroom,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name="Аудитория",
+        db_column="classroom_id",
     )
 
-    # 🔗 Связи
-    group = models.ForeignKey(Group, on_delete=models.CASCADE, verbose_name="Группа")
-    discipline = models.ForeignKey(Discipline, on_delete=models.CASCADE, verbose_name="Дисциплина")
-    teacher = models.ForeignKey(Teacher, on_delete=models.SET_NULL, null=True, verbose_name="Преподаватель")
-    classroom = models.ForeignKey(Classroom, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Аудитория")
-
-    # 📅 Основные параметры
-    shift = models.PositiveSmallIntegerField(choices=SHIFT_CHOICES, default=1, verbose_name="Смена")
     weekday = models.PositiveSmallIntegerField(choices=WEEKDAY_CHOICES, verbose_name="День недели")
     week_type = models.CharField(max_length=20, choices=WEEK_TYPE_CHOICES, default="numerator", verbose_name="Тип недели")
     lesson_number = models.PositiveSmallIntegerField(choices=LESSON_CHOICES, verbose_name="Номер пары")
-
-    # ⏰ Автоматически выставляемые поля
     start_time = models.TimeField(verbose_name="Начало", blank=True, null=True)
     end_time = models.TimeField(verbose_name="Конец", blank=True, null=True)
 
-    def save(self, *args, **kwargs):
-        """
-        При сохранении:
-        1. Автоматически подставляем время по смене и номеру пары.
-        2. Если аудитория не указана — берём из дисциплины.
-        """
-
-        # Время для первой смены
-        times_shift_1 = {
-            1: ("08:00", "09:20"),
-            2: ("09:30", "10:50"),
-            3: ("11:00", "12:20"),
-            4: ("12:30", "13:50"),
-        }
-
-        # Время для второй смены
-        times_shift_2 = {
-            1: ("13:00", "14:20"),
-            2: ("14:30", "15:50"),
-            3: ("16:00", "17:20"),
-            4: ("17:30", "18:50"),
-        }
-
-        lesson_times = times_shift_1 if self.shift == 1 else times_shift_2
-        if not self.start_time or not self.end_time:
-            from datetime import time
-            start_str, end_str = lesson_times.get(self.lesson_number, (None, None))
-            if start_str and end_str:
-                self.start_time = time.fromisoformat(start_str)
-                self.end_time = time.fromisoformat(end_str)
-
-        # Автоматическая подстановка аудитории
-        if not self.classroom and self.discipline and self.discipline.classroom:
-            self.classroom = self.discipline.classroom
-
-        super().save(*args, **kwargs)
-
     def __str__(self):
         return (
-            f"{self.group.name_group} | {self.get_weekday_display()} "
-            f"({self.get_shift_display()}, {self.lesson_number} пара)"
+            f"{self.group.name_group} | {self.get_weekday_display()} | "
+            f"{self.lesson_number} пара | {self.get_week_type_display()}"
         )
+
+    class Meta:
+        db_table = "main_classschedule"
+        verbose_name = "Расписание"
+        verbose_name_plural = "Расписание"
+
+class DirectionDiscipline(models.Model):
+    COURSE_CHOICES = (
+        (1, "1 курс"),
+        (2, "2 курс"),
+        (3, "3 курс"),
+        (4, "4 курс"),
+    )
+
+    direction = models.ForeignKey(
+        Direction,
+        on_delete=models.CASCADE,
+        db_column="direction_id",
+        related_name="direction_disciplines",
+        verbose_name="Направление"
+    )
+    discipline = models.ForeignKey(
+        "Discipline",
+        on_delete=models.CASCADE,
+        db_column="discipline_id",
+        related_name="direction_discipline_links",
+        verbose_name="Дисциплина"
+    )
+    is_required = models.BooleanField(default=True, verbose_name="Обязательная")
+    course = models.PositiveSmallIntegerField(
+        choices=COURSE_CHOICES,
+        verbose_name="Курс",
+        null=True,
+        blank=True,
+    )
+
+    def __str__(self):
+        return f"{self.direction.code} -> {self.discipline.name_dis} ({self.course or 'без курса'})"
+
+    class Meta:
+        db_table = "main_direction_discipline"
+        verbose_name = "Связь направления и дисциплины"
+        verbose_name_plural = "Связи направлений и дисциплин"
+        unique_together = ("direction", "discipline", "course")

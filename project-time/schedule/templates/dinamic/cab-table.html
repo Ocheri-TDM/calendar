@@ -1,31 +1,52 @@
+{% for room in page_obj %}
+<tr data-id="{{ room.id }}">
+    <td>
+        <div class="auditorium-number">
+            {{ room.number_room }}
+        </div>
+    </td>
 
-                    {% for room in page_obj %}
-                        <tr data-id="{{ room.id }}">
-                            <td><div class="auditorium-number">{{ room.number_room }}</div></td>
-                            <td class="auditorium-floor">{{ room.floor }} этаж</td>
-                            <td>
-                                {% if room.status == "free" %}
-                                    <span class="badge badge-success">Доступна</span>
-                                {% elif room.status == "busy" %}
-                                    <span class="badge badge-warning">Занята</span>
-                                {% else %}
-                                    <span class="badge badge-danger">На ремонте</span>
-                                {% endif %}
-                            </td>
-                            <td class="actions-cell">
-                                <button class="action-btn edit-btn edit-auditorium-btn"
-                                        data-id="{{ room.id }}"
-                                        data-number="{{ room.number_room }}"
-                                        data-floor="{{ room.floor }}"
-                                        data-status="{{ room.status }}">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button class="action-btn delete-btn" data-id="{{ room.id }}">
-                                    <i class="fas fa-trash-alt"></i>
-                                </button>
-                            </td>
-                        </tr>
-                    {% endfor %}
+    <td class="auditorium-floor">
+        {{ room.floor }} этаж
+    </td>
 
+    <td>
+        {% if room.status == "free" %}
+            <span class="badge badge-success">Доступна</span>
+        {% elif room.status == "busy" %}
+            <span class="badge badge-warning">Занята</span>
+        {% elif room.status == "repair" %}
+            <span class="badge badge-danger">На ремонте</span>
+        {% else %}
+            <span class="badge">Неизвестно</span>
+        {% endif %}
+    </td>
 
+    <td class="actions-cell">
+        <button
+            type="button"
+            class="action-btn edit-btn edit-auditorium-btn"
+            data-id="{{ room.id }}"
+            data-number="{{ room.number_room }}"
+            data-floor="{{ room.floor }}"
+            data-status="{{ room.status }}"
+        >
+            <i class="fas fa-edit"></i>
+        </button>
 
+        <button
+            type="button"
+            class="action-btn delete-btn"
+            data-id="{{ room.id }}"
+        >
+            <i class="fas fa-trash-alt"></i>
+        </button>
+    </td>
+</tr>
+{% empty %}
+<tr>
+    <td colspan="4" style="text-align: center; padding: 20px;">
+        Аудитории не найдены
+    </td>
+</tr>
+{% endfor %}

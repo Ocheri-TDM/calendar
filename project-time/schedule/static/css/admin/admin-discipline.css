@@ -468,34 +468,68 @@
             background: #f9f9f9;
         }
         
-
 .teacher-list {
-    max-height: 180px;
+    max-height: 190px;
     overflow-y: auto;
-    border: 1px solid #ccc;
-    border-radius: 8px;
+    border: 1px solid #dfe6ee;
+    border-radius: 10px;
     padding: 8px;
     background-color: #fff;
     margin-top: 6px;
+    scrollbar-width: thin;
+    scrollbar-color: #c5d1dd #f5f7fa;
 }
+
+.teacher-list::-webkit-scrollbar {
+    width: 8px;
+}
+
+.teacher-list::-webkit-scrollbar-track {
+    background: #f5f7fa;
+    border-radius: 10px;
+}
+
+.teacher-list::-webkit-scrollbar-thumb {
+    background: #c5d1dd;
+    border-radius: 10px;
+}
+
+
 
 .teacher-item {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 6px;
+    padding: 8px 10px;
     cursor: pointer;
-    border-radius: 6px;
-    transition: background-color 0.2s;
+    border-radius: 8px;
+    transition: background-color 0.2s, transform 0.15s;
 }
 
 .teacher-item:hover {
-    background-color: #f1f1f1;
+    background-color: #f4f8fc;
+    transform: translateX(2px);
 }
 
 .teacher-item input[type="checkbox"] {
     width: 16px;
     height: 16px;
+}
+
+.badge-direction {
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    background: rgba(41, 128, 185, 0.12);
+    color: var(--secondary);
+    border: 1px solid rgba(41, 128, 185, 0.18);
+}
+
+.form-select[name="direction"] {
+    background: linear-gradient(180deg, #ffffff 0%, #fbfcfe 100%);
+    font-weight: 500;
 }
 
        

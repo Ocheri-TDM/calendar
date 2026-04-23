@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <div class="schedule-container">
+     <div class="schedule-container">
         <!-- Шапка -->
         <div class="header">
             <h1><i class="fas fa-calendar-alt"></i> Расписание занятий</h1>
@@ -97,241 +97,93 @@
             <p style="margin-top: 1rem">Для изменения отображаемых данных используйте фильтры вверху страницы</p>
         </footer>
     </div>
-<!-- Визуал (Можно трогать) -->
-    <script>
-        // Активация дня недели при клике
-        document.querySelectorAll('.day-header').forEach(day => {
-            day.addEventListener('click', () => {
-                // Удаляем active у всех элементов
-                document.querySelectorAll('.day-header').forEach(d => {
-                    d.classList.remove('active');
-                });
-                // Добавляем active выбранному
-                day.classList.add('active');
-            });
-        });
-
-        document.querySelectorAll('.schedule-scroll').forEach(el => {
-            let targetScroll = el.scrollLeft;
-            let isAnimating = false;
-
-            el.addEventListener('wheel', e => {
-
-                const atLeft = el.scrollLeft <= 0;
-                const atRight = el.scrollLeft + el.clientWidth >= el.scrollWidth - 1;
-
-                // если скролл не горизонтальный или мы достигли краев — пропускаем скролл странице
-                if (Math.abs(e.deltaY) <= Math.abs(e.deltaX) || (atLeft && e.deltaY < 0) || (atRight && e.deltaY > 0)) {
-                    return; // ничего не блокируем
-                }
-
-                // иначе — плавный горизонтальный скролл
-                e.preventDefault();
-                targetScroll += e.deltaY * 1.1;
-
-                targetScroll = Math.max(0, Math.min(targetScroll, el.scrollWidth));
-
-                if (!isAnimating) smoothScroll();
-            });
-
-            function smoothScroll() {
-                isAnimating = true;
-
-                const step = () => {
-                    const diff = targetScroll - el.scrollLeft;
-                    const move = diff * 1; // коэффициент плавности
-
-                    el.scrollLeft += move;
-
-                    if (Math.abs(diff) > 0.5) {
-                        requestAnimationFrame(step);
-                    } else {
-                        isAnimating = false;
-                    }
-                };
-
-                requestAnimationFrame(step);
-            }
-        });
-
-    </script>
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const dayHeaders = document.querySelectorAll(".day-header");
-            const weekRangeSpan = document.querySelector(".date-selector span");
-
-            const today = new Date();
-
-            const todayWeekday = today.getDay(); // 0 вс, 1 пн...
-            const monday = new Date(today);
-            const offset = (todayWeekday === 0 ? -6 : 1 - todayWeekday);
-            monday.setDate(today.getDate() + offset);
-
-            function formatDay(date) {
-                return date.toLocaleDateString("ru-RU", {
-                    day: 'numeric',
-                    month: 'long',
-                    year: 'numeric'
-                });
-            }
-
-            function formatWeekRange(startDate) {
-                const endDate = new Date(startDate);
-                endDate.setDate(startDate.getDate() + 6);
-
-                // "11 марта — 17 марта 2025 г."
-                return `${startDate.toLocaleDateString("ru-RU", { day: 'numeric', month: 'long' })} — ${
-                    endDate.toLocaleDateString("ru-RU", { day: 'numeric', month: 'long', year: 'numeric' })
-                }`;
-            }
-
-            // ставим диапазон недели в верхний блок
-            if (weekRangeSpan) {
-                weekRangeSpan.textContent = formatWeekRange(monday);
-            }
-
-            dayHeaders.forEach((el, i) => {
-                const date = new Date(monday);
-                date.setDate(monday.getDate() + i);
-
-                el.querySelector("span").textContent = formatDay(date);
-
-                el.classList.remove("active");
-
-                if (i === (todayWeekday === 0 ? 0 : todayWeekday - 1)) {
-                    el.classList.add("active");
-                }
-            });
-        });
-    </script>
-<!-- логика (НЕ ТРОГАТЬ) -->
-    <script>
-    const scheduleContainer = document.querySelector(".schedule-body");
+   
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const scheduleContainer = document.getElementById("schedule-wrapper");
     const shiftSelect = document.getElementById("shift-select");
     const groupSelect = document.getElementById("group-select");
     const weekSelect = document.getElementById("week-select");
+    const dayHeaders = document.querySelectorAll(".day-header");
+    const weekRangeSpan = document.querySelector(".date-selector span");
 
-    // Времена по сменам
     const shiftTimes = {
         1: ["08:30 - 09:50", "10:00 - 11:20", "11:30 - 12:50", "13:00 - 14:20"],
         2: ["13:30 - 14:50", "15:00 - 16:20", "16:30 - 17:50", "18:00 - 19:20"]
     };
 
-    // Фильтруем группы по смене
+    function getWeekValue(raw) {
+        return raw === "Числитель" ? "numerator" : "denominator";
+    }
+
     function filterGroupsByShift() {
-        const selectedShift = shiftSelect.value; // "" / "1" / "2"
+        const selectedShift = shiftSelect.value;
 
         Array.from(groupSelect.options).forEach(option => {
-            if (!option.value) return; // пропускаем "Выберите группу"
-            const groupShift = option.dataset.shift;
+            if (!option.value) return;
 
-            if (!selectedShift || selectedShift === groupShift) {
-                option.style.display = "block";
-            } else {
-                option.style.display = "none";
-            }
+            const groupShift = option.dataset.shift;
+            option.hidden = !!(selectedShift && selectedShift !== groupShift);
         });
 
-        if (groupSelect.selectedOptions[0].style.display === "none") {
+        const selectedOption = groupSelect.selectedOptions[0];
+        if (selectedOption && selectedOption.hidden) {
             groupSelect.value = "";
             scheduleContainer.style.display = "none";
+            scheduleContainer.innerHTML = "";
+            sessionStorage.removeItem("selectedGroup");
         }
     }
 
-    // Обновление расписания
-    async function updateSchedule() {
-        const groupId = groupSelect.value;
-        const week = getWeekValue(weekSelect.value);
-
-        if (!groupId) return;
-
-        const response = await fetch(`/api/schedule/?group_id=${groupId}&week_type=${week}`);
-        const data = await response.json();
-
-        scheduleContainer.innerHTML = data.html; // вставляем готовый HTML
-        applyShiftTimes(); // применяем правильные времена
-    }
-
-    // Применяем времена по смене (для вторника)
     function applyShiftTimes() {
-        const selectedShift = parseInt(groupSelect.selectedOptions[0].dataset.shift, 10);
+        const selectedOption = groupSelect.selectedOptions[0];
+        if (!selectedOption) return;
+
+        const selectedShift = parseInt(selectedOption.dataset.shift, 10);
         if (!selectedShift) return;
 
         const tuesdayCol = scheduleContainer.querySelector('ul[data-weekday="2"]');
         if (!tuesdayCol) return;
 
-        const lessonDivs = Array.from(tuesdayCol.querySelectorAll('.class-card')).filter(
-            div => !div.classList.contains('mentoring-card')
+        const lessonDivs = Array.from(
+            tuesdayCol.querySelectorAll(".class-card")
+        ).filter(div =>
+            !div.closest(".mentoring-card") &&
+            !div.classList.contains("practice-card")
         );
 
         lessonDivs.forEach(div => {
-            const timeDiv = div.querySelector('.class-time');
-            const slotNumberEl = div.querySelector('.slot-count');
+            const timeDiv = div.querySelector(".class-time");
+            const slotNumberEl = div.querySelector(".slot-count");
 
             if (!timeDiv || !slotNumberEl) return;
 
             const slotNum = parseInt(slotNumberEl.textContent.replace(/\D/g, ""), 10);
 
             if (slotNum >= 1 && slotNum <= shiftTimes[selectedShift].length) {
-                timeDiv.textContent = shiftTimes[selectedShift][slotNum - 1];
+                const newTime = shiftTimes[selectedShift][slotNum - 1];
+                timeDiv.textContent = newTime;
+                div.dataset.time = newTime.replace(/\s/g, "");
             }
         });
 
-        // Кураторский час
-        const mentoringDiv = tuesdayCol.querySelector('.mentoring-card .class-time');
+        const mentoringDiv = tuesdayCol.querySelector(".mentoring-card .class-time-g");
         if (mentoringDiv) {
             mentoringDiv.textContent = selectedShift === 2 ? "13:00 - 13:25" : "08:00 - 08:25";
         }
     }
-
-    // События
-    groupSelect.addEventListener("change", () => {
-        if (!groupSelect.value) {
-            scheduleContainer.style.display = "none";
-            sessionStorage.removeItem("selectedGroup");
-            return;
-        }
-
-        sessionStorage.setItem("selectedGroup", groupSelect.value);
-        scheduleContainer.style.display = "flex";
-        updateSchedule();
-    });
-
-    weekSelect.addEventListener("change", updateSchedule);
-    shiftSelect.addEventListener("change", () => {
-        filterGroupsByShift();
-        updateSchedule(); // обновляем расписание при смене смены
-    });
-
-    // восстановление выбора
-    const saved = sessionStorage.getItem("selectedGroup");
-    if (saved) {
-        groupSelect.value = saved;
-        scheduleContainer.style.display = "flex";
-        updateSchedule();
-    }
-
-    // Фильтрация групп по умолчанию при загрузке страницы
-    filterGroupsByShift();
-
-    function getWeekValue(raw) {
-        return raw === "Числитель" ? "numerator" : "denominator";
-    }
-
-    </script>
-    <script>
-document.addEventListener("DOMContentLoaded", () => {
 
     function highlightCurrentClass() {
         const now = new Date();
         const currentMinutes = now.getHours() * 60 + now.getMinutes();
 
         document.querySelectorAll(".class-card").forEach(card => {
-            let timeText = card.dataset.time; // ожидаем "08:30-09:50"
+            if (card.classList.contains("practice-card")) return;
+
+            let timeText = card.dataset.time;
             if (!timeText) return;
 
-            // убираем пробелы на всякий случай
-            timeText = timeText.replace(/\s/g, '');
+            timeText = timeText.replace(/\s/g, "");
 
             const [startStr, endStr] = timeText.split("-");
             if (!startStr || !endStr) return;
@@ -350,8 +202,178 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // вызываем сразу и каждые 30 секунд
-    highlightCurrentClass();
+    async function updateSchedule() {
+        const groupId = groupSelect.value;
+        const week = getWeekValue(weekSelect.value);
+
+        if (!groupId) {
+            scheduleContainer.style.display = "none";
+            scheduleContainer.innerHTML = "";
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/schedule/?group_id=${groupId}&week_type=${week}`);
+            const data = await response.json();
+
+            scheduleContainer.innerHTML = data.html || "";
+            scheduleContainer.style.display = "flex";
+
+            if (data.mode === "schedule") {
+                applyShiftTimes();
+                highlightCurrentClass();
+            }
+
+            if (data.mode === "practice") {
+                // Для практики отдельная заглушка, обычные пары не трогаем
+            }
+
+            if (data.mode === "empty") {
+                // Для пустого состояния просто показываем то, что вернул backend
+            }
+        } catch (err) {
+            console.error("Ошибка загрузки расписания:", err);
+            scheduleContainer.style.display = "none";
+        }
+    }
+
+    function initDayHeaders() {
+        const today = new Date();
+        const todayWeekday = today.getDay(); // 0 = воскресенье
+        const monday = new Date(today);
+        const offset = (todayWeekday === 0 ? -6 : 1 - todayWeekday);
+        monday.setDate(today.getDate() + offset);
+
+        function formatDay(date) {
+            return date.toLocaleDateString("ru-RU", {
+                day: "numeric",
+                month: "long",
+                year: "numeric"
+            });
+        }
+
+        function formatWeekRange(startDate) {
+            const endDate = new Date(startDate);
+            endDate.setDate(startDate.getDate() + 6);
+
+            return `${startDate.toLocaleDateString("ru-RU", { day: "numeric", month: "long" })} — ${
+                endDate.toLocaleDateString("ru-RU", { day: "numeric", month: "long", year: "numeric" })
+            }`;
+        }
+
+        if (weekRangeSpan) {
+            weekRangeSpan.textContent = formatWeekRange(monday);
+        }
+
+        dayHeaders.forEach((el, i) => {
+            const date = new Date(monday);
+            date.setDate(monday.getDate() + i);
+
+            const span = el.querySelector("span");
+            if (span) {
+                span.textContent = formatDay(date);
+            }
+
+            el.classList.remove("active");
+
+            if (i === (todayWeekday === 0 ? 0 : todayWeekday - 1)) {
+                el.classList.add("active");
+            }
+        });
+    }
+
+    function initDayHeaderClicks() {
+        dayHeaders.forEach(day => {
+            day.addEventListener("click", () => {
+                dayHeaders.forEach(d => d.classList.remove("active"));
+                day.classList.add("active");
+            });
+        });
+    }
+
+    function initHorizontalScroll() {
+        document.querySelectorAll(".schedule-scroll").forEach(el => {
+            let targetScroll = el.scrollLeft;
+            let isAnimating = false;
+
+            el.addEventListener("wheel", e => {
+                const atLeft = el.scrollLeft <= 0;
+                const atRight = el.scrollLeft + el.clientWidth >= el.scrollWidth - 1;
+
+                if (
+                    Math.abs(e.deltaY) <= Math.abs(e.deltaX) ||
+                    (atLeft && e.deltaY < 0) ||
+                    (atRight && e.deltaY > 0)
+                ) {
+                    return;
+                }
+
+                e.preventDefault();
+                targetScroll += e.deltaY * 1.1;
+                targetScroll = Math.max(0, Math.min(targetScroll, el.scrollWidth));
+
+                if (!isAnimating) smoothScroll();
+            });
+
+            function smoothScroll() {
+                isAnimating = true;
+
+                const step = () => {
+                    const diff = targetScroll - el.scrollLeft;
+                    const move = diff * 1;
+
+                    el.scrollLeft += move;
+
+                    if (Math.abs(diff) > 0.5) {
+                        requestAnimationFrame(step);
+                    } else {
+                        isAnimating = false;
+                    }
+                };
+
+                requestAnimationFrame(step);
+            }
+        });
+    }
+
+    groupSelect.addEventListener("change", () => {
+        if (!groupSelect.value) {
+            scheduleContainer.style.display = "none";
+            scheduleContainer.innerHTML = "";
+            sessionStorage.removeItem("selectedGroup");
+            return;
+        }
+
+        sessionStorage.setItem("selectedGroup", groupSelect.value);
+        scheduleContainer.style.display = "flex";
+        updateSchedule();
+    });
+
+    weekSelect.addEventListener("change", updateSchedule);
+
+    shiftSelect.addEventListener("change", () => {
+        filterGroupsByShift();
+
+        if (groupSelect.value) {
+            updateSchedule();
+        }
+    });
+
+    const saved = sessionStorage.getItem("selectedGroup");
+    if (saved) {
+        groupSelect.value = saved;
+    }
+
+    initDayHeaders();
+    initDayHeaderClicks();
+    initHorizontalScroll();
+    filterGroupsByShift();
+
+    if (groupSelect.value) {
+        scheduleContainer.style.display = "flex";
+        updateSchedule();
+    }
+
     setInterval(highlightCurrentClass, 30000);
 });
 </script>

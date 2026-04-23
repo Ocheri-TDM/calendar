@@ -25,10 +25,9 @@ class ClassroomAdmin(admin.ModelAdmin):
 
 @admin.register(Discipline)
 class DisciplineAdmin(admin.ModelAdmin):
-    list_display = ("name_dis", "classroom", "duration_hours", "control_type", "status")
+    list_display = ("name_dis", "duration_hours", "control_type", "status")
     list_filter = ("status", "classroom")
     search_fields = ("name_dis", "control_type")
-    filter_horizontal = ("teachers",)  # красиво для выбора ManyToMany
 
 
 
@@ -39,22 +38,16 @@ class ClassScheduleAdmin(admin.ModelAdmin):
         "group",
         "discipline",
         "teacher",
+        "weekday",
+        "lesson_number",
+        "week_type",
         "classroom",
-        "weekday",
-        "lesson_number",
-        "week_type",
-        "shift",
-        "start_time",
-        "end_time",
     )
+
     list_filter = (
-        "group",
-        "discipline",
-        "teacher",
-        "weekday",
-        "lesson_number",
         "week_type",
-        "shift",
+        "weekday",
+        "group__shift",  # если хочешь фильтр по смене
     )
     search_fields = (
         "group__name_group",

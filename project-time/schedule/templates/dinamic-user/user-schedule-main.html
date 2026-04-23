@@ -1,13 +1,12 @@
 {% for weekday, lessons in schedule.items %}
     <ul class="schedule-col" data-weekday="{{ weekday }}">
-        
-        {# Кураторский час во вторник #}
+
         {% if weekday == 2 %}
         <li class="class-slot mentoring-card">
             <div class="class-card">
                 <div class="subject-name-g">Кураторский час</div>
-                
-                {% if lessons.0.group.shift == 2 %}
+
+                {% if group.shift == 2 %}
                     <div class="class-time-g">13:00 - 13:25</div>
                 {% else %}
                     <div class="class-time-g">08:00 - 08:25</div>
@@ -15,10 +14,12 @@
 
                 <div class="teacher-name-g">
                     <span class="fa-icon-g"><i class="fas fa-user-tie"></i></span>
-                    {% if lessons.0.group.supervisor %}
-                        {{ lessons.0.group.supervisor.last_name }}
-                        {{ lessons.0.group.supervisor.first_name|first }}.
-                        {{ lessons.0.group.supervisor.patronymic|first }}.
+                    {% if group.supervisor %}
+                        {{ group.supervisor.last_name }}
+                        {{ group.supervisor.first_name|first }}.
+                        {% if group.supervisor.patronymic %}
+                            {{ group.supervisor.patronymic|first }}.
+                        {% endif %}
                     {% else %}
                         Не назначен
                     {% endif %}
@@ -26,29 +27,44 @@
 
                 <div class="room-info-g">
                     <span class="fa-icon-g"><i class="fas fa-building"></i></span>
-                    Ауд. 301
+                    Ауд. 609
                 </div>
             </div>
         </li>
         {% endif %}
 
-        {# Обычные пары #}
         {% if lessons %}
             {% for item in lessons %}
                 <li class="class-slot">
                     <div class="class-card" data-time="{{ item.start_time|time:'H:i' }}-{{ item.end_time|time:'H:i' }}">
                         <div class="subject-name">{{ item.discipline.name_dis }}</div>
+
                         <div class="class-time">
                             {{ item.start_time|time:"H:i" }} - {{ item.end_time|time:"H:i" }}
                         </div>
+
                         <div class="teacher-name">
                             <span class="fa-icon"><i class="fas fa-user-tie"></i></span>
-                            <span>{{ item.teacher }}</span>
+                            <span>
+                                {% if item.teacher %}
+                                    {{ item.teacher }}
+                                {% else %}
+                                    Не указан
+                                {% endif %}
+                            </span>
                         </div>
+
                         <div class="room-info">
                             <span class="fa-icon"><i class="fas fa-building"></i></span>
-                            <span>{{ item.classroom }}</span>
+                            <span>
+                                {% if item.classroom %}
+                                    {{ item.classroom }}
+                                {% else %}
+                                    Не указано
+                                {% endif %}
+                            </span>
                         </div>
+
                         <div class="slot-count">{{ item.get_lesson_number_display }}</div>
                     </div>
                 </li>

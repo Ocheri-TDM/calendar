@@ -1,850 +1,802 @@
 {% extends 'admin/admin-header.html' %}
 {% load static %}
 {% load custom_tags %}
-{% block title %} Редактирование расписания {% endblock %}
+{% block title %}Редактирование расписания{% endblock %}
+
 {% block content %}
+<link rel="stylesheet" href="{% static 'css/admin/admin-schedule.css' %}">
+<link rel="stylesheet" href="{% static 'css/append.css' %}">
 
-    <!-- Подключение стилей для яркой панели администратора -->
+<div class="admin-container">
+    <nav class="admin-sidebar">
+        <a href="{% url 'admin-schedule' %}" class="nav-item active">
+            <i class="fas fa-table"></i>
+            Расписание занятий
+        </a>
+        <a href="{% url 'admin-group' %}" class="nav-item">
+            <i class="fas fa-users"></i>
+            Управление группами
+        </a>
+        <a href="{% url 'admin-discipline' %}" class="nav-item">
+            <i class="fas fa-book"></i>
+            Управление предметами
+        </a>
+        <a href="{% url 'admin-teacher' %}" class="nav-item">
+            <i class="fas fa-chalkboard-teacher"></i>
+            Управление преподавателями
+        </a>
+        <a href="{% url 'admin-cab' %}" class="nav-item">
+            <i class="fas fa-door-open"></i>
+            Управление аудиториями
+        </a>
 
-    
-    <!-- Контейнер администратора -->
-    <div class="admin-container">
-        <!-- Светлая боковая панель -->
-        <nav class="admin-sidebar">
-            <a href="{% url 'admin-schedule' %}" class="nav-item active">
-                <i class="fas fa-table"></i>
-                Расписание занятий
-            </a>
-            <a href="{% url 'admin-group' %}" class="nav-item">
-                <i class="fas fa-users "></i>
-                Управление группами
-            </a>
-            <a href="{% url 'admin-discipline' %}" class="nav-item">
-                <i class="fas fa-book"></i>
-                Управление предметами
-            </a>
-            <a href="{% url 'admin-teacher' %}" class="nav-item">
-                <i class="fas fa-chalkboard-teacher"></i>
-                Управление преподавателями
-            </a>
-            <a href="{% url 'admin-cab' %}" class="nav-item">
-                <i class="fas fa-door-open"></i>
-                Управление аудиториями
-            </a>
-            <div class="nav-divider"></div>
-            <div class="nav-item">
-                <i class="fas fa-cog"></i>
-                Настройки системы
-            </div>
-            <div class="nav-item">
-                <i class="fas fa-sign-out-alt"></i>
-                Выход
-            </div>
-        </nav>
-        
-        <!-- Основной контент -->
-        <main class="admin-main-content">
-            <div class="toolbar">
-                <div class="toolbar-title">
-                    <div class="toolbar-icon">
-                        <i class="fas fa-calendar-check"></i>
-                    </div>
-                    <h2 class="main-title">Редактирование расписания</h2>
+        <div class="nav-divider"></div>
+
+        <div class="nav-item">
+            <i class="fas fa-cog"></i>
+            Настройки системы
+        </div>
+        <div class="nav-item">
+            <i class="fas fa-sign-out-alt"></i>
+            Выход
+        </div>
+    </nav>
+
+    <main class="admin-main-content">
+        <div class="toolbar">
+            <div class="toolbar-title">
+                <div class="toolbar-icon">
+                    <i class="fas fa-calendar-check"></i>
                 </div>
-                <div class="toolbar-actions">
-                    <button class="toolbar-btn btn-main" id="refresh-btn">
-                        <i class="fas fa-sync-alt"></i> Обновить
-                    </button>
-                </div>
+                <h2 class="main-title">Редактирование расписания</h2>
             </div>
-            
-            <!-- 🔍 Карточки фильтров -->
-            <div class="filters">
 
-            <!-- Группа -->
+            <div class="toolbar-actions">
+                <button class="toolbar-btn btn-main" id="refresh-btn" type="button">
+                    <i class="fas fa-sync-alt"></i> Обновить
+                </button>
+            </div>
+        </div>
+
+        <div class="filters">
             <div class="filter-card">
                 <div class="filter-card-header">
-                <div class="filter-icon"><i class="fas fa-users"></i></div>
-                <div class="filter-title">Группа</div>
+                    <div class="filter-icon"><i class="fas fa-users"></i></div>
+                    <div class="filter-title">Группа</div>
                 </div>
+
                 <select id="filter-group" class="filter-select">
-                <option value="">Выберите группу</option>
-                {% for g in groups %}
-                    <option value="{{ g.id }}">{{ g.name_group }}</option>
-                {% endfor %}
+                    <option value="">Выберите группу</option>
+                    {% for g in groups %}
+                        <option
+                            value="{{ g.id }}"
+                            {% if selected_group and selected_group.id == g.id %}selected{% endif %}
+                        >
+                            {{ g.name_group }}
+                        </option>
+                    {% endfor %}
                 </select>
             </div>
 
-            <!-- Тип недели -->
             <div class="filter-card">
                 <div class="filter-card-header">
-                <div class="filter-icon"><i class="fas fa-calendar-week"></i></div>
-                <div class="filter-title">Тип недели</div>
+                    <div class="filter-icon"><i class="fas fa-graduation-cap"></i></div>
+                    <div class="filter-title">Направление</div>
                 </div>
+
+                <select id="filter-direction" class="filter-select">
+                    <option value="">Все направления</option>
+                    {% for d in directions %}
+                        <option value="{{ d.id }}" {% if selected_direction == d.id %}selected{% endif %}>
+                            {{ d.code }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="filter-card">
+                <div class="filter-card-header">
+                    <div class="filter-icon"><i class="fas fa-calendar-week"></i></div>
+                    <div class="filter-title">Тип недели</div>
+                </div>
+
                 <select id="filter-week-type" class="filter-select">
-                <option value="numerator" selected>Числитель</option>
-                <option value="denominator">Знаменатель</option>
+                    <option value="numerator" {% if selected_week_type == "numerator" %}selected{% endif %}>Числитель</option>
+                    <option value="denominator" {% if selected_week_type == "denominator" %}selected{% endif %}>Знаменатель</option>
                 </select>
             </div>
 
-            <!-- Смена -->
             <div class="filter-card">
                 <div class="filter-card-header">
-                <div class="filter-icon"><i class="fas fa-sun"></i></div>
-                <div class="filter-title">Смена</div>
+                    <div class="filter-icon"><i class="fas fa-sun"></i></div>
+                    <div class="filter-title">Смена</div>
                 </div>
+
                 <select id="filter-shift" class="filter-select">
-                <option value="">Все смены</option>
-                <option value="1">Первая смена</option>
-                <option value="2">Вторая смена</option>
+                    <option value="">Все смены</option>
+                    <option value="1" {% if selected_shift == 1 %}selected{% endif %}>Первая смена</option>
+                    <option value="2" {% if selected_shift == 2 %}selected{% endif %}>Вторая смена</option>
                 </select>
             </div>
 
-            <!-- Дата начала -->
             <div class="filter-card">
                 <div class="filter-card-header">
-                <div class="filter-icon"><i class="fas fa-calendar-day"></i></div>
-                <div class="filter-title">Дата начала</div>
+                    <div class="filter-icon"><i class="fas fa-calendar-day"></i></div>
+                    <div class="filter-title">Дата начала</div>
                 </div>
+
                 <input id="filter-date" type="date" class="filter-select" value="{{ today|date:'Y-m-d' }}">
             </div>
+        </div>
 
+        {% if selected_group %}
+        <div class="schedule-meta">
+            <div class="schedule-meta-card">
+                <i class="fas fa-users"></i>
+                <span>Группа: <strong>{{ selected_group.name_group }}</strong></span>
             </div>
 
-            
-            <!-- Расписание с ярким дизайном -->
-            <div class="admin-schedule-container hidden">
-                <div class="admin-schedule-scroll">
-    <!-- Заголовки -->
-        <ul class="admin-schedule-header">
-            <li class="admin-day-header">ПН <span>12.02</span></li>
-            <li class="admin-day-header">ВТ <span>13.02</span></li>
-            <li class="admin-day-header">СР <span>14.02</span></li>
-            <li class="admin-day-header">ЧТ <span>15.02</span></li>
-            <li class="admin-day-header">ПТ <span>16.02</span></li>
-        </ul>
+            <div class="schedule-meta-card">
+                <i class="fas fa-calendar-week"></i>
+                <span>
+                    Неделя:
+                    <strong>
+                        {% if selected_week_type == "numerator" %}
+                            Числитель
+                        {% else %}
+                            Знаменатель
+                        {% endif %}
+                    </strong>
+                </span>
+            </div>
 
-        <!-- Тело -->
-      <div class="admin-schedule-body" id="schedule-table">
-        {% include 'dinamic/schedule-table.html' %}
-    </div>
+            <div class="schedule-meta-card">
+                <i class="fas fa-sun"></i>
+                <span>
+                    Смена:
+                    <strong>
+                        {% if selected_shift == 2 %}
+                            Вторая
+                        {% elif selected_shift == 1 %}
+                            Первая
+                        {% else %}
+                            Не выбрана
+                        {% endif %}
+                    </strong>
+                </span>
+            </div>
+        </div>
+        {% endif %}
 
+        <div class="admin-schedule-container {% if not selected_group %}hidden{% endif %}">
+            <div class="admin-schedule-scroll">
+                <ul class="admin-schedule-header">
+                    <li class="admin-day-header">
+                        <span>ПН</span>
+                        <small>Понедельник</small>
+                    </li>
+                    <li class="admin-day-header">
+                        <span>ВТ</span>
+                        <small>Вторник</small>
+                    </li>
+                    <li class="admin-day-header">
+                        <span>СР</span>
+                        <small>Среда</small>
+                    </li>
+                    <li class="admin-day-header">
+                        <span>ЧТ</span>
+                        <small>Четверг</small>
+                    </li>
+                    <li class="admin-day-header">
+                        <span>ПТ</span>
+                        <small>Пятница</small>
+                    </li>
+                </ul>
 
-
-
-    </div>
+                <div class="admin-schedule-body" id="schedule-table">
+                    {% include 'dinamic/schedule-table.html' %}
+                </div>
+            </div>
+        </div>
+    </main>
 </div>
 
-
-        </main>
-    </div>
-
-    
-<link rel="stylesheet" href="{% static 'css/admin/admin-schedule.css' %}">
-
-
-    <!-- Модальное окно для создания/редактирования расписания -->
+<!-- МОДАЛКА -->
 <div class="modal-overlay" id="schedule-modal">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h3 class="modal-title">Создать карточку расписания</h3>
-      <button class="close-btn" id="close-schedule">&times;</button>
-    </div>
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">Создать карточку расписания</h3>
+            <button type="button" class="close-btn" id="close-schedule">&times;</button>
+        </div>
 
-    <div class="form-group">
-      <label class="form-label">Предмет</label>
-      <input type="text" id="discipline-search" class="form-input" placeholder="Введите название предмета...">
-      <ul id="discipline-results" class="dropdown-list"></ul>
-    </div>
+        <div class="form-group">
+            <label class="form-label">Предмет</label>
+            <input type="text" id="discipline-search" class="form-input" placeholder="Введите название предмета...">
+            <ul id="discipline-results" class="dropdown-list"></ul>
+        </div>
 
-      <div class="form-group">
-        <label class="form-label">Время</label>
-        <select class="form-select" id="time-select">
-          <option value="1">1 пара (08:00–09:20)</option>
-          <option value="2">2 пара (09:30–10:50)</option>
-          <option value="3">3 пара (11:00–12:20)</option>
-          <option value="4">4 пара (12:30–13:50)</option>
-        </select>
-      </div>
+        <div class="form-group">
+            <label class="form-label">Дата</label>
+            <input type="date" id="lesson-date" class="form-input">
+        </div>
 
-    <div class="form-group">
-      <label class="form-label">Преподаватель</label>
-      <select class="form-select" id="teacher-select">
-        <option disabled selected>Выберите преподавателя</option>
-      </select>
-    </div>
+        <div class="form-group">
+            <label class="form-label">Время</label>
+            <select class="form-select" id="time-select"></select>
+        </div>
 
-    <div class="form-group">
-      <label class="form-label">Кабинет</label>
-      <input type="text" class="form-input" id="room-input" placeholder="Автоматически подставляется">
-    </div>
+        <div class="form-group">
+            <label class="form-label">Преподаватель</label>
+            <select class="form-select" id="teacher-select">
+                <option value="" selected>Выберите преподавателя</option>
+            </select>
+        </div>
 
-    <div class="form-group">
-      <label class="form-label">Тип недели</label>
-      <select class="form-select" id="week-type-select">
-        <option value="numerator">Числитель</option>
-        <option value="denominator">Знаменатель</option>
-      </select>
-    </div>
+        <div class="form-group">
+            <label class="form-label">Кабинет</label>
+            <input
+                type="text"
+                class="form-input"
+                id="room-input"
+                list="room-options"
+                placeholder="Выберите или введите..."
+                autocomplete="off"
+            >
+            <datalist id="room-options"></datalist>
+        </div>
 
-    <div class="form-footer">
-      <button class="form-btn btn-cancel" id="cancel-schedule">Отмена</button>
-      <button class="form-btn btn-delete hidden" id="delete-schedule">Удалить</button>
-      <button class="form-btn btn-save">Сохранить</button>
+        <div class="form-group">
+            <label class="form-label">Тип недели</label>
+            <select class="form-select" id="week-type-select">
+                <option value="numerator">Числитель</option>
+                <option value="denominator">Знаменатель</option>
+            </select>
+        </div>
+
+        <div class="form-footer">
+            <button type="button" class="form-btn btn-cancel" id="cancel-schedule">Отмена</button>
+            <button type="button" class="form-btn btn-delete hidden" id="delete-schedule">Удалить</button>
+            <button type="button" class="form-btn btn-save" id="save-schedule">Сохранить</button>
+        </div>
     </div>
-  </div>
 </div>
 
 <script>
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
+    let isEditMode = false;
+    let currentLessonId = null;
+    let selectedDisciplineId = null;
+    let selectedWeekday = null;
 
-  // ==========================
-  // 🔹 Элементы интерфейса
-  // ==========================
-  const filterDateInput = document.getElementById("filter-date");
-  const groupSelect = document.getElementById("filter-group");
-  const shiftSelect = document.getElementById("filter-shift");
-  const weekTypeSelect = document.getElementById("filter-week-type");
-  const scheduleContainer = document.querySelector(".admin-schedule-container");
-  const scheduleTable = document.getElementById("schedule-table");
-  const dayHeaderSpans = Array.from(document.querySelectorAll(".admin-schedule-header .admin-day-header span"));
-  const scheduleModal = document.getElementById("schedule-modal");
-  const disciplineSearch = document.getElementById("discipline-search");
-  const disciplineResults = document.getElementById("discipline-results");
-  const teacherSelect = document.getElementById("teacher-select");
-  const roomInput = document.getElementById("room-input");
-  const saveBtn = scheduleModal?.querySelector(".btn-save");
+    const groupSelect = document.getElementById("filter-group");
+    const shiftSelect = document.getElementById("filter-shift");
+    const weekTypeSelect = document.getElementById("filter-week-type");
+    const filterDateInput = document.getElementById("filter-date");
 
-  let selectedDisciplineId = null;
-  let selectedWeekday = null;
+    const scheduleContainer = document.querySelector(".admin-schedule-container");
+    const scheduleTable = document.getElementById("schedule-table");
 
-  // ==========================
-  // 🔹 Время пар по сменам
-  // ==========================
-  const lessonsByShift = {
-    1: {
-      default: [
-        { num: 1, time: "1 пара (08:00–09:20)" },
-        { num: 2, time: "2 пара (09:30–10:50)" },
-        { num: 3, time: "3 пара (11:00–12:20)" },
-        { num: 4, time: "4 пара (12:30–13:50)" },
-      ],
-      2: [
-        { num: 0, time: "Кураторский час (08:00–08:25)" },
-        { num: 1, time: "1 пара (08:30–09:50)" },
-        { num: 2, time: "2 пара (10:00–11:20)" },
-        { num: 3, time: "3 пара (11:30–12:50)" },
-        { num: 4, time: "4 пара (13:00–14:20)" },
-      ]
-    },
-    2: {
-      default: [
-        { num: 1, time: "1 пара (13:00–14:20)" },
-        { num: 2, time: "2 пара (14:30–15:50)" },
-        { num: 3, time: "3 пара (16:00–17:20)" },
-        { num: 4, time: "4 пара (17:30–18:50)" },
-      ],
-      2: [
-        { num: 0, time: "Кураторский час (13:00–13:25)" },
-        { num: 1, time: "1 пара (13:30–14:50)" },
-        { num: 2, time: "2 пара (15:00–16:20)" },
-        { num: 3, time: "3 пара (16:30–17:50)" },
-        { num: 4, time: "4 пара (18:00–19:20)" },
-      ]
-    }
-  };
+    const scheduleModal = document.getElementById("schedule-modal");
+    const modalTitle = scheduleModal.querySelector(".modal-title");
 
-  function updateTimeSelect(shift, weekday = null) {
+    const disciplineSearch = document.getElementById("discipline-search");
+    const disciplineResults = document.getElementById("discipline-results");
+    const teacherSelect = document.getElementById("teacher-select");
+    const roomInput = document.getElementById("room-input");
+    const roomOptions = document.getElementById("room-options");
+    const lessonDateInput = document.getElementById("lesson-date");
     const timeSelect = document.getElementById("time-select");
-    if (!timeSelect) return;
-    timeSelect.innerHTML = "";
 
-    const schedule = lessonsByShift[shift] || lessonsByShift[1];
-    const daySchedule = weekday === 2 ? schedule[2] : schedule.default;
+    const saveBtn = document.getElementById("save-schedule");
+    const deleteBtn = document.getElementById("delete-schedule");
 
-    daySchedule.forEach(l => {
-      const opt = document.createElement("option");
-      opt.value = l.num;
-      opt.textContent = l.time;
-      timeSelect.appendChild(opt);
-    });
-  }
+    const dayHeaderSpans = Array.from(document.querySelectorAll(".admin-schedule-header .admin-day-header span"));
 
-  // ==========================
-  // 🔹 Утилиты
-  // ==========================
-  function getMonday(d) {
-    const date = new Date(d);
-    const local = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-    const day = local.getDay();
-    const diff = (day + 6) % 7;
-    local.setDate(local.getDate() - diff);
-    return local;
-  }
+    const directionSelect = document.getElementById("filter-direction");
 
-  function setWeekHeaders(baseDate) {
-    if (!dayHeaderSpans || dayHeaderSpans.length < 5) return;
-    const monday = getMonday(baseDate);
-    for (let i = 0; i < 5; i++) {
-      const d = new Date(monday);
-      d.setDate(monday.getDate() + i);
-      const str = d.toLocaleDateString("ru-RU", { day: "2-digit", month: "2-digit" });
-      if (dayHeaderSpans[i]) dayHeaderSpans[i].textContent = str;
+    const lessonsByShift = {
+        1: {
+            default: [
+                { num: 1, time: "1 пара (08:00–09:20)" },
+                { num: 2, time: "2 пара (09:30–10:50)" },
+                { num: 3, time: "3 пара (11:00–12:20)" },
+                { num: 4, time: "4 пара (12:30–13:50)" },
+            ],
+            2: [
+                { num: 1, time: "1 пара (08:30–09:50)" },
+                { num: 2, time: "2 пара (10:00–11:20)" },
+                { num: 3, time: "3 пара (11:30–12:50)" },
+                { num: 4, time: "4 пара (13:00–14:20)" },
+            ]
+        },
+        2: {
+            default: [
+                { num: 1, time: "1 пара (13:00–14:20)" },
+                { num: 2, time: "2 пара (14:30–15:50)" },
+                { num: 3, time: "3 пара (16:00–17:20)" },
+                { num: 4, time: "4 пара (17:30–18:50)" },
+            ],
+            2: [
+                { num: 1, time: "1 пара (13:30–14:50)" },
+                { num: 2, time: "2 пара (15:00–16:20)" },
+                { num: 3, time: "3 пара (16:30–17:50)" },
+                { num: 4, time: "4 пара (18:00–19:20)" },
+            ]
+        }
+    };
+
+    async function updateGroupOptions(preserveSelected = true) {
+        const shift = shiftSelect.value;
+        const direction = directionSelect.value;
+        const currentSelected = preserveSelected ? groupSelect.value : "";
+
+        try {
+            const url = new URL("/api/groups/", window.location.origin);
+
+            if (shift) url.searchParams.set("shift", shift);
+            if (direction) url.searchParams.set("direction", direction);
+
+            const res = await fetch(url);
+            const data = await res.json();
+
+            groupSelect.innerHTML = `<option value="">Выберите группу</option>`;
+
+            if (Array.isArray(data.groups)) {
+                data.groups.forEach(group => {
+                    const option = document.createElement("option");
+                    option.value = group.id;
+                    option.textContent = `${group.name_group}${group.direction_code ? " • " + group.direction_code : ""}`;
+                    if (String(group.id) === String(currentSelected)) {
+                        option.selected = true;
+                    }
+                    groupSelect.appendChild(option);
+                });
+            }
+
+            const stillExists = [...groupSelect.options].some(opt => opt.value === currentSelected);
+            if (currentSelected && !stillExists) {
+                groupSelect.value = "";
+                scheduleContainer.classList.add("hidden");
+                scheduleTable.innerHTML = "";
+            }
+        } catch (err) {
+            console.warn("Ошибка при обновлении списка групп:", err);
+        }
     }
-  }
 
-  function ddmmToIso(ddmm) {
-    if (!ddmm) return "";
-    const [day, month] = ddmm.split(".");
-    const year = new Date().getFullYear();
-    return `${year}-${month}-${day}`;
-  }
-
-  function getCSRFToken() {
-    const name = "csrftoken";
-    const cookie = document.cookie.split("; ").find(row => row.startsWith(name + "="));
-    return cookie ? decodeURIComponent(cookie.split("=")[1]) : "";
-  }
-
-  // ==========================
-  // 🔹 Обновление таблицы
-  // ==========================
-  async function updateSchedule() {
-    const groupId = sessionStorage.getItem("selectedGroup");
-    const shift = sessionStorage.getItem("selectedShift") || shiftSelect?.value || 1;
-    const weekType = sessionStorage.getItem("selectedWeekType") || weekTypeSelect?.value || "numerator";
-    if (!groupId) return;
-
-    try {
-      const res = await fetch(`/load-schedule-table/?group=${groupId}&shift=${shift}&week_type=${weekType}`);
-      const data = await res.json();
-      if (data.html && scheduleTable) scheduleTable.innerHTML = data.html;
-    } catch (err) {
-      console.warn("Ошибка при обновлении таблицы:", err);
+    function getCSRFToken() {
+        const name = "csrftoken";
+        const cookie = document.cookie.split("; ").find(row => row.startsWith(name + "="));
+        return cookie ? decodeURIComponent(cookie.split("=")[1]) : "";
     }
-  }
 
-
-  // ==========================
-  // 🔹 Инициализация даты
-  // ==========================
-  (function initFilterDate() {
-    const today = new Date();
-    if (filterDateInput) {
-      if (!filterDateInput.value)
-        filterDateInput.value = today.toISOString().split("T")[0];
-      const initDate = new Date(filterDateInput.value);
-      if (!isNaN(initDate)) setWeekHeaders(initDate);
-    } else {
-      setWeekHeaders(today);
+    function getMonday(dateStr) {
+        const date = new Date(dateStr);
+        const local = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+        const day = local.getDay();
+        const diff = (day + 6) % 7;
+        local.setDate(local.getDate() - diff);
+        return local;
     }
-  })();
 
-  // ==========================
-  // 🔹 Переключение типа недели (фильтр)
-  // ==========================
-  if (weekTypeSelect) {
-    weekTypeSelect.addEventListener("change", async () => {
-      const selectedType = weekTypeSelect.value;
-      sessionStorage.setItem("selectedWeekType", selectedType);
-      console.log("📆 Переключен тип недели:", selectedType);
-      await updateSchedule();  // обновляем таблицу
-    });
+    function highlightCurrentDay(baseDateValue) {
+        if (!baseDateValue) return;
 
-    // Восстанавливаем выбор при загрузке страницы
-    const savedType = sessionStorage.getItem("selectedWeekType");
-    if (savedType) {
-      weekTypeSelect.value = savedType;
+        const monday = getMonday(baseDateValue);
+        const today = new Date();
+
+        const headers = document.querySelectorAll(".admin-schedule-header .admin-day-header");
+
+        headers.forEach((el, index) => {
+            const d = new Date(monday);
+            d.setDate(monday.getDate() + index);
+
+            el.classList.remove("current-day");
+
+            if (
+                d.getDate() === today.getDate() &&
+                d.getMonth() === today.getMonth() &&
+                d.getFullYear() === today.getFullYear()
+            ) {
+                el.classList.add("current-day");
+            }
+        });
     }
-  }
 
-  // ==========================
-  // 🔹 При выборе группы
-  // ==========================
-  if (groupSelect) {
-    groupSelect.addEventListener("change", async () => {
-      const groupId = groupSelect.value;
+    function setWeekHeaders(baseDateValue) {
+        if (!baseDateValue) return;
+        const monday = getMonday(baseDateValue);
 
-      if (!groupId) {
-        sessionStorage.removeItem("selectedGroup");
-        scheduleContainer?.classList.add("hidden");
-        return;
-      }
+        for (let i = 0; i < 5; i++) {
+            const d = new Date(monday);
+            d.setDate(monday.getDate() + i);
+            const str = d.toLocaleDateString("ru-RU", { day: "2-digit", month: "2-digit" });
+            if (dayHeaderSpans[i]) dayHeaderSpans[i].textContent = str;
+        }
+    }
 
-      try {
-        const res = await fetch(`/api/get-group-shift/?group_id=${groupId}`);
+    function ddmmToIso(ddmm) {
+        if (!ddmm) return "";
+        const [day, month] = ddmm.split(".");
+        const year = new Date().getFullYear();
+        return `${year}-${month}-${day}`;
+    }
+
+    function updateTimeSelect(shift, weekday = null) {
+        timeSelect.innerHTML = "";
+        const schedule = lessonsByShift[shift] || lessonsByShift[1];
+        const daySchedule = weekday === 2 ? schedule[2] : schedule.default;
+
+        daySchedule.forEach(item => {
+            const opt = document.createElement("option");
+            opt.value = item.num;
+            opt.textContent = item.time;
+            timeSelect.appendChild(opt);
+        });
+    }
+
+    function resetModal() {
+        isEditMode = false;
+        currentLessonId = null;
+        selectedDisciplineId = null;
+        selectedWeekday = null;
+
+        disciplineSearch.value = "";
+        disciplineResults.innerHTML = "";
+        teacherSelect.innerHTML = `<option value="">Выберите преподавателя</option>`;
+        roomInput.value = "";
+        roomOptions.innerHTML = "";
+        lessonDateInput.value = "";
+        deleteBtn.classList.add("hidden");
+
+        modalTitle.textContent = "Создать карточку расписания";
+        saveBtn.textContent = "Сохранить";
+    }
+
+    function openModal() {
+        scheduleModal.classList.add("active");
+    }
+
+    function closeModal() {
+        scheduleModal.classList.remove("active");
+        resetModal();
+    }
+
+    async function updateSchedule() {
+        const groupId = groupSelect.value;
+        const shift = shiftSelect.value;
+        const weekType = weekTypeSelect.value;
+
+        if (!groupId) {
+            scheduleContainer.classList.add("hidden");
+            return;
+        }
+
+        try {
+            const res = await fetch(`/load-schedule-table/?group=${groupId}&shift=${shift}&week_type=${weekType}`, {
+                headers: { "X-Requested-With": "XMLHttpRequest" }
+            });
+            const data = await res.json();
+
+            if (data.html) {
+                scheduleTable.innerHTML = data.html;
+                scheduleContainer.classList.remove("hidden");
+                highlightCurrentDay(filterDateInput.value);
+                scheduleContainer.dataset.groupState = data.group_state || "";
+            }
+        } catch (err) {
+            console.warn("Ошибка при обновлении таблицы:", err);
+        }
+    }
+
+    async function getNextLessonNumber(groupId, weekday, shift, weekType) {
+        try {
+            const res = await fetch(
+                `/api/get-next-lesson/?group=${groupId}&weekday=${weekday}&shift=${shift}&week_type=${weekType}`
+            );
+            const data = await res.json();
+            if (data.next_lesson) {
+                timeSelect.value = data.next_lesson;
+            }
+        } catch (err) {
+            console.warn("Ошибка при получении следующей пары:", err);
+        }
+    }
+
+    async function loadDisciplineDetails(disciplineId, selectedTeacherId = null, selectedRoom = "") {
+        const res = await fetch(`/get-discipline-details/${disciplineId}/`);
         const data = await res.json();
-        const shift = data.shift || 1;
 
-        sessionStorage.setItem("selectedGroup", groupId);
-        sessionStorage.setItem("selectedShift", shift);
+        teacherSelect.innerHTML = `<option value="">Выберите преподавателя</option>`;
+        roomOptions.innerHTML = "";
 
-        shiftSelect.value = shift;
-        updateTimeSelect(shift);
-        scheduleContainer?.classList.remove("hidden");
+        if (Array.isArray(data.teachers)) {
+            data.teachers.forEach(t => {
+                const opt = document.createElement("option");
+                opt.value = t.id;
+                opt.textContent = t.name;
+                teacherSelect.appendChild(opt);
+            });
+        }
 
-        await updateSchedule();
-      } catch (err) {
-        console.warn("Ошибка при загрузке смены:", err);
-      }
+        if (selectedTeacherId) {
+            teacherSelect.value = String(selectedTeacherId);
+        }
+
+        if (Array.isArray(data.rooms)) {
+            data.rooms.forEach(roomNum => {
+                const option = document.createElement("option");
+                option.value = roomNum;
+                roomOptions.appendChild(option);
+            });
+        }
+
+        if (selectedRoom) {
+            roomInput.value = selectedRoom;
+        } else if (data.rooms && data.rooms.length > 0) {
+            roomInput.value = data.rooms[0];
+        }
+    }
+
+    if (!filterDateInput.value) {
+        filterDateInput.value = new Date().toISOString().split("T")[0];
+    }
+    setWeekHeaders(filterDateInput.value);
+    highlightCurrentDay(filterDateInput.value);
+
+    filterDateInput.addEventListener("change", () => {
+        setWeekHeaders(filterDateInput.value);
+        highlightCurrentDay(filterDateInput.value);
     });
 
-    const savedGroup = sessionStorage.getItem("selectedGroup");
-    const savedShift = sessionStorage.getItem("selectedShift") || 1;
-    if (savedGroup) {
-      groupSelect.value = savedGroup;
-      shiftSelect.value = savedShift;
-      updateTimeSelect(savedShift);
-      scheduleContainer?.classList.remove("hidden");
-      updateSchedule();
-    }
-  }
+    groupSelect.addEventListener("change", async () => {
+        const groupId = groupSelect.value;
 
-  // ==========================
-  // 🔹 Получение следующего номера пары
-  // ==========================
-  async function getNextLessonNumber(groupId, weekday, shift, weekType) {
-    try {
-      const res = await fetch(
-        `/api/get-next-lesson/?group=${groupId}&weekday=${weekday}&shift=${shift}&week_type=${weekType}`
-      );
-      const data = await res.json();
-      if (data.next_lesson) {
-        const timeSelect = document.getElementById("time-select");
-        if (timeSelect) timeSelect.value = data.next_lesson;
-      }
-    } catch (err) {
-      console.warn("Ошибка при получении следующей пары:", err);
-    }
-  }
+        if (!groupId) {
+            scheduleContainer.classList.add("hidden");
+            return;
+        }
 
-  // ==========================
-  // 🔹 Открытие модалки
-  // ==========================
-  document.body.addEventListener("click", async (e) => {
-    const btn = e.target.closest(".add-class-btn");
-    if (!btn) return;
+        try {
+            const res = await fetch(`/api/get-group-shift/?group_id=${groupId}`);
+            const data = await res.json();
 
-    
+            if (data.shift) {
+                shiftSelect.value = String(data.shift);
+            }
 
-    isEditMode = false;
-    currentLessonId = null;
+            await updateSchedule();
+        } catch (err) {
+            console.warn("Ошибка при загрузке смены:", err);
+        }
+    });
 
-    selectedWeekday = parseInt(btn.dataset.weekday, 10);
-    const headerLi = document.querySelector(`.admin-schedule-header li:nth-child(${selectedWeekday})`);
-    const span = headerLi?.querySelector("span");
-    const ddmm = span?.textContent.trim();
-    const iso = ddmm ? ddmmToIso(ddmm) : "";
+    shiftSelect.addEventListener("change", async () => {
+        await updateGroupOptions(false);
+    });
 
-    const dateInput = document.getElementById("lesson-date");
-    if (dateInput && iso) dateInput.value = iso;
+    directionSelect.addEventListener("change", async () => {
+        await updateGroupOptions(false);
+    });
 
-    const groupId = sessionStorage.getItem("selectedGroup");
-    const shift = parseInt(sessionStorage.getItem("selectedShift") || 1);
-    const weekTypeSelectModal = document.getElementById("week-type-select");
-    const currentWeek = Math.ceil((((new Date() - new Date(new Date().getFullYear(), 0, 1)) / 86400000) + new Date().getDay() + 1) / 7);
-    const isNumerator = currentWeek % 2 !== 0;
+    weekTypeSelect.addEventListener("change", updateSchedule);
 
-    if (weekTypeSelectModal) {
-      weekTypeSelectModal.value = isNumerator ? "numerator" : "denominator";
-      if (weekTypeSelect && weekTypeSelect.value)
-        weekTypeSelectModal.value = weekTypeSelect.value;
-    }
+    document.body.addEventListener("click", async (e) => {
+        const addBtn = e.target.closest(".add-class-btn");
+        if (addBtn) {
+            if (scheduleContainer.dataset.groupState === "practice") {
+                alert("Для этой группы сейчас идет практика. Обычное расписание не выдается.");
+                return;
+            }
+            resetModal();
 
-    const weekType = weekTypeSelectModal?.value || "numerator";
-    updateTimeSelect(shift, selectedWeekday);
+            selectedWeekday = parseInt(addBtn.dataset.weekday, 10);
+            const shift = parseInt(shiftSelect.value || 1, 10);
 
-    if (groupId && selectedWeekday) {
-      await getNextLessonNumber(groupId, selectedWeekday, shift, weekType);
-    }
+            const headerLi = document.querySelector(`.admin-schedule-header li:nth-child(${selectedWeekday})`);
+            const span = headerLi?.querySelector("span");
+            const ddmm = span?.textContent.trim();
+            const iso = ddmm ? ddmmToIso(ddmm) : "";
+            if (iso) lessonDateInput.value = iso;
 
-    // 🆕 Исправлено: кураторский час блокируется ТОЛЬКО если выбрано время №0
-    // Устанавливаем значение времени только в режиме редактирования
-    const timeSelect = document.getElementById("time-select");
-    if (isEditMode && typeof currentLesson !== "undefined" && currentLesson) {
-        timeSelect.value = currentLesson.lesson_number;
-    } else {
-        // В режиме создания просто ставим первую доступную пару
-        timeSelect.selectedIndex = 0;
-    }
-    const firstOption = timeSelect?.options[0];
-    const selectedTime = parseInt(timeSelect?.value || 1);
+            document.getElementById("week-type-select").value = weekTypeSelect.value;
 
-    if (selectedWeekday === 2 && selectedTime === 0) {
-      // Вторник + кураторский час → блокируем
-      disciplineSearch.value = "Кураторский час";
-      disciplineSearch.disabled = true;
+            updateTimeSelect(shift, selectedWeekday);
 
-      teacherSelect.innerHTML = `<option selected>Петрова Е.В.</option>`;
-      teacherSelect.disabled = true;
+            if (groupSelect.value && selectedWeekday) {
+                await getNextLessonNumber(groupSelect.value, selectedWeekday, shift, weekTypeSelect.value);
+            }
 
-      roomInput.value = "301";
-      roomInput.disabled = true;
+            openModal();
+            return;
+        }
 
-      timeSelect.value = 0;
-      timeSelect.disabled = true;
-    } else {
-      // Любой другой случай — обычный режим
-      disciplineSearch.value = "";
-      disciplineSearch.disabled = false;
+        const editBtn = e.target.closest(".edit-class-btn");
+        if (editBtn) {
+            if (scheduleContainer.dataset.groupState === "practice") {
+                alert("Для этой группы сейчас идет практика. Редактирование обычного расписания недоступно.");
+                return;
+            }
+            resetModal();
 
-      teacherSelect.disabled = false;
-      teacherSelect.innerHTML = `<option disabled selected>Выберите преподавателя</option>`;
+            isEditMode = true;
+            currentLessonId = editBtn.dataset.lessonId;
+            selectedWeekday = parseInt(editBtn.dataset.weekday, 10);
 
-      roomInput.value = "";
-      roomInput.disabled = false;
-      timeSelect.disabled = false;
-    }
+            modalTitle.textContent = "Редактировать карточку расписания";
+            saveBtn.textContent = "Сохранить изменения";
+            deleteBtn.classList.remove("hidden");
 
-    scheduleModal?.classList.add("active");
-  });
+            const shift = parseInt(shiftSelect.value || 1, 10);
+            updateTimeSelect(shift, selectedWeekday);
 
-  document.body.addEventListener("click", async (e) => {
-    const editBtn = e.target.closest(".edit-class-btn");
-    if (!editBtn) return;
+            const disciplineId = editBtn.dataset.disciplineId;
+            const disciplineName = editBtn.dataset.disciplineName || "";
+            const teacherId = editBtn.dataset.teacherId || "";
+            const room = editBtn.dataset.room || "";
+            const lessonNumber = editBtn.dataset.lessonNumber || "1";
+            const weekType = editBtn.dataset.weekType || weekTypeSelect.value;
 
-    // 🟡 Режим редактирования
-    isEditMode = true;
-    currentLessonId = editBtn.dataset.lessonId;
+            selectedDisciplineId = disciplineId;
+            disciplineSearch.value = disciplineName;
+            timeSelect.value = lessonNumber;
+            document.getElementById("week-type-select").value = weekType;
 
-    // Получаем данные занятия (через dataset или fetch)
-    const lessonData = await getLessonData(currentLessonId);
+            const headerLi = document.querySelector(`.admin-schedule-header li:nth-child(${selectedWeekday})`);
+            const span = headerLi?.querySelector("span");
+            const ddmm = span?.textContent.trim();
+            const iso = ddmm ? ddmmToIso(ddmm) : "";
+            if (iso) lessonDateInput.value = iso;
 
-    // Заполняем форму
-    document.getElementById("discipline-search").value = lessonData.discipline_name;
-    document.getElementById("teacher-select").value = lessonData.teacher_id;
-    document.getElementById("time-select").value = lessonData.lesson_number;
-    document.getElementById("room-input").value = lessonData.room;
-    document.getElementById("week-type-select").value = lessonData.week_type;
+            if (disciplineId) {
+                await loadDisciplineDetails(disciplineId, teacherId, room);
+            }
 
-    document.querySelector(".modal-title").textContent = "Редактировать карточку расписания";
-    document.querySelector(".btn-save").textContent = "Сохранить изменения";
+            openModal();
+            return;
+        }
+    });
 
-    scheduleModal?.classList.add("active");
-  });
+    document.getElementById("close-schedule").addEventListener("click", closeModal);
+    document.getElementById("cancel-schedule").addEventListener("click", closeModal);
 
-  // ==========================
-  // 🔹 Закрытие модалки
-  // ==========================
-  ["close-schedule", "cancel-schedule"].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.addEventListener("click", () => scheduleModal?.classList.remove("active"));
-  });
-  if (scheduleModal) {
     scheduleModal.addEventListener("click", (e) => {
-      if (e.target === scheduleModal) scheduleModal.classList.remove("active");
+        if (e.target === scheduleModal) {
+            closeModal();
+        }
     });
-  }
 
-  // ==========================
-  // 🔹 Поиск дисциплины
-  // ==========================
-  if (disciplineSearch) {
     disciplineSearch.addEventListener("input", async () => {
-      const query = disciplineSearch.value.trim();
-      disciplineResults.innerHTML = "";
-      if (query.length < 2) return;
+        const query = disciplineSearch.value.trim();
+        disciplineResults.innerHTML = "";
+        selectedDisciplineId = null;
 
-      const res = await fetch(`/search-discipline/?q=${encodeURIComponent(query)}`);
-      const data = await res.json();
-      if (!Array.isArray(data) || data.length === 0) return;
+        if (query.length < 2) return;
 
-      data.forEach(item => {
-        const li = document.createElement("li");
-        li.textContent = item.name;
-        li.dataset.id = item.id;
-        disciplineResults.appendChild(li);
-      });
+        const res = await fetch(`/search-discipline/?q=${encodeURIComponent(query)}`);
+        const data = await res.json();
+
+        if (!Array.isArray(data) || data.length === 0) return;
+
+        data.forEach(item => {
+            const li = document.createElement("li");
+            li.textContent = item.name;
+            li.dataset.id = item.id;
+            disciplineResults.appendChild(li);
+        });
     });
 
     disciplineResults.addEventListener("click", async (e) => {
-      const li = e.target.closest("li");
-      if (!li) return;
-      selectedDisciplineId = li.dataset.id;
-      disciplineSearch.value = li.textContent;
-      disciplineResults.innerHTML = "";
+        const li = e.target.closest("li");
+        if (!li) return;
 
-      const res = await fetch(`/get-discipline-details/${selectedDisciplineId}/`);
-      const data = await res.json();
+        selectedDisciplineId = li.dataset.id;
+        disciplineSearch.value = li.textContent;
+        disciplineResults.innerHTML = "";
 
-      teacherSelect.innerHTML = `<option disabled selected>Выберите преподавателя</option>`;
-      if (Array.isArray(data.teachers)) {
-        data.teachers.forEach(t => {
-          const opt = document.createElement("option");
-          opt.value = t.id;
-          opt.textContent = t.name;
-          teacherSelect.appendChild(opt);
-        });
-      }
-      roomInput.value = data.room || "";
-    });
-  }
-
-  // ==========================
-  // 🔹 Подсветка текущей пары (с учётом вторника и смены)
-  // ==========================
-  function highlightCurrentLesson() {
-    const now = new Date();
-    const currentHours = now.getHours();
-    const currentMinutes = now.getMinutes();
-    const currentTime = currentHours * 60 + currentMinutes;
-
-    // Определяем день недели (1 = понедельник, 2 = вторник, ... 7 = воскресенье)
-    const today = now.getDay();
-    const weekday = today === 0 ? 7 : today; // Приводим к 1–7
-
-    // Берём выбранную смену
-    const shift = parseInt(sessionStorage.getItem("selectedShift") || 1);
-
-    // Снимаем подсветку со всех
-    document.querySelectorAll(".current-lesson").forEach(el => {
-      el.classList.remove("current-lesson");
+        await loadDisciplineDetails(selectedDisciplineId);
     });
 
-    // Находим колонку текущего дня
-    const todayColumn = document.querySelector(`.schedule-col[data-weekday='${weekday}']`);
-    if (!todayColumn) return; // если расписания на этот день нет — выходим
-
-    // Проверяем все карточки внутри этого дня
-    todayColumn.querySelectorAll(".admin-class-card").forEach(card => {
-      const timeText = card.querySelector(".admin-class-time")?.textContent;
-      if (!timeText) return;
-
-      const match = timeText.match(/(\d{1,2}):(\d{2})\s*[-–]\s*(\d{1,2}):(\d{2})/);
-      if (!match) return;
-
-      const [ , sh, sm, eh, em ] = match.map(Number);
-      const start = sh * 60 + sm;
-      const end = eh * 60 + em;
-
-      if (currentTime >= start && currentTime <= end) {
-        card.classList.add("current-lesson");
-      }
-    });
-  }
-
-
-
-  function adjustTuesdayTimesVisual() {
-    const shift = parseInt(sessionStorage.getItem("selectedShift") || 1);
-
-    // Находим все карточки вторника
-    const tuesdayCol = document.querySelector(".schedule-col[data-weekday='2']");
-    if (!tuesdayCol) return;
-
-    const cards = tuesdayCol.querySelectorAll(".admin-class-card");
-
-    cards.forEach(card => {
-      const subject = (card.querySelector(".admin-subject-name")?.textContent || "").trim();
-      const timeDiv = card.querySelector(".admin-class-time");
-      if (!timeDiv) return;
-
-      // 🔹 Кураторский час
-      if (/кураторский/i.test(subject)) {
-        timeDiv.textContent = shift === 2 ? "13:00 - 13:25" : "08:00 - 08:25";
-        return;
-      }
-
-      // 🔹 Остальные пары — начинаются позже кураторского
-      const info = card.querySelector(".admin-room-info-2")?.textContent || "";
-      const numMatch = info.match(/(\d+)/);
-      if (!numMatch) return;
-
-      const lessonNum = parseInt(numMatch[1]);
-
-      // Список правильных времён вторника
-      const shiftTimes = {
-        1: ["08:30 - 09:50", "10:00 - 11:20", "11:30 - 12:50", "13:00 - 14:20"],
-        2: ["13:30 - 14:50", "15:00 - 16:20", "16:30 - 17:50", "18:00 - 19:20"]
-      };
-
-      if (lessonNum >= 1 && lessonNum <= 4) {
-        timeDiv.textContent = shiftTimes[shift][lessonNum - 1];
-      }
-    });
-  }
-
-  // 🎯 Вызываем после загрузки и после обновления расписания
-  document.addEventListener("DOMContentLoaded", adjustTuesdayTimesVisual);
-
-  // Переопределяем updateSchedule, чтобы обновлять после AJAX-подгрузки
-  if (typeof window.__originalUpdateSchedule === 'undefined') {
-    window.__originalUpdateSchedule = updateSchedule;
-  }
-
-  async function updateScheduleWithVisualFix() {
-    await window.__originalUpdateSchedule();
-    requestAnimationFrame(() => adjustTuesdayTimesVisual());
-  }
-
-  updateSchedule = updateScheduleWithVisualFix;
-
-
-
-  // ==========================
-  // 🔹 Редактирование карточки расписания
-  // ==========================
-  document.body.addEventListener("click", async (e) => {
-    const card = e.target.closest(".admin-class-card");
-    if (!card || card.classList.contains("add-card") || card.classList.contains("mentoring-card")) return;
-
-    const id = card.dataset.lessonId;
-    if (id) {
-      isEditMode = true;
-      currentLessonId = id;
-    } else {
-      isEditMode = false;
-      currentLessonId = null;
-    }
-
-    scheduleModal.classList.add("active");
-    const modalTitle = scheduleModal.querySelector(".modal-title");
-    modalTitle.textContent = "Редактирование занятия";
-    saveBtn.textContent = "Сохранить изменения";
-
-    // Извлекаем данные из карточки
-    const subject = card.querySelector(".admin-subject-name")?.textContent.trim() || "";
-    const teacherFull = card.querySelector(".admin-teacher-name")?.textContent.trim() || "";
-    const room = card.querySelector(".admin-room-info")?.textContent.replace(/[^0-9]+/g, "") || "";
-    const lessonNumber = card.querySelector(".admin-room-info-2")?.textContent.match(/\d+/)?.[0] || "1";
-    document.querySelector(".btn-save").textContent = "Сохранить изменения";
-    deleteBtn.classList.remove("hidden");
-
-    disciplineSearch.value = subject;
-    roomInput.value = room;
-    document.getElementById("time-select").value = lessonNumber;
-
-    // Загружаем дисциплину и преподавателей
-    const res = await fetch(`/search-discipline/?q=${encodeURIComponent(subject)}`);
-    const data = await res.json();
-
-    if (Array.isArray(data) && data.length > 0) {
-      const dis = data[0];
-      selectedDisciplineId = dis.id; // ✅ теперь ID дисциплины сохранится корректно
-
-      const det = await fetch(`/get-discipline-details/${dis.id}/`);
-      const detData = await det.json();
-
-      teacherSelect.innerHTML = `<option disabled selected>Выберите преподавателя</option>`;
-      if (Array.isArray(detData.teachers)) {
-        detData.teachers.forEach(t => {
-          const opt = document.createElement("option");
-          opt.value = t.id;
-          opt.textContent = t.name;
-          teacherSelect.appendChild(opt);
-          if (teacherFull.includes(t.name)) teacherSelect.value = t.id;
-        });
-      }
-    }
-  });
-
-  // ==========================
-  // 🔹 Сохранение карточки (дополнено режимом редактирования)
-  // ==========================
-  if (saveBtn) {
     saveBtn.addEventListener("click", async () => {
-      const group_id = sessionStorage.getItem("selectedGroup");
-      const shift = sessionStorage.getItem("selectedShift") || 1;
-      const week_type = document.getElementById("week-type-select")?.value || weekTypeSelect?.value || "numerator";
-      const discipline_id = selectedDisciplineId;
-      const teacher_id = teacherSelect?.value;
-      const lesson_number = document.getElementById("time-select")?.value;
-      const date = document.getElementById("lesson-date")?.value;
-      deleteBtn.classList.add("hidden");
+        const payload = {
+            group_id: groupSelect.value,
+            discipline_id: selectedDisciplineId,
+            teacher_id: teacherSelect.value,
+            lesson_number: timeSelect.value,
+            weekday: selectedWeekday,
+            shift: shiftSelect.value || 1,
+            week_type: document.getElementById("week-type-select").value,
+            date: lessonDateInput.value,
+            room: roomInput.value.trim()
+        };
 
-      if (!group_id) return alert("⚠️ Выберите группу!");
-      if (!discipline_id) return alert("⚠️ Не выбрана дисциплина!");
-      if (!teacher_id || !lesson_number) return alert("⚠️ Заполните все поля!");
+        if (!payload.group_id) return alert("⚠️ Выберите группу!");
+        if (!payload.discipline_id) return alert("⚠️ Не выбрана дисциплина!");
+        if (!payload.teacher_id) return alert("⚠️ Не выбран преподаватель!");
+        if (!payload.lesson_number) return alert("⚠️ Не выбрана пара!");
+        if (!payload.weekday) return alert("⚠️ Не выбран день недели!");
 
-      saveBtn.disabled = true;
-      saveBtn.textContent = "Сохраняем...";
+        saveBtn.disabled = true;
+        saveBtn.textContent = isEditMode ? "Сохраняем..." : "Создаём...";
 
-      const payload = { group_id, shift, week_type, discipline_id, teacher_id, lesson_number, date, weekday: selectedWeekday};
-      console.log("Payload:", payload);
-      
-      try {
-        const url = (isEditMode && currentLessonId)
-          ? `/update-schedule/${encodeURIComponent(currentLessonId)}/`
-          : `/create-schedule/`;
+        try {
+            const url = isEditMode && currentLessonId
+                ? `/update-schedule/${currentLessonId}/`
+                : `/create-schedule/`;
 
-        const res = await fetch(url, {
-          method: "POST",
-          headers: { "Content-Type": "application/json", "X-CSRFToken": getCSRFToken() },
-          body: JSON.stringify(payload)
-        });
-        const result = await res.json();
+            const res = await fetch(url, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": getCSRFToken()
+                },
+                body: JSON.stringify(payload)
+            });
 
-        if (result.success) {
-          alert(isEditMode ? "✅ Изменения сохранены!" : "✅ Занятие добавлено!");
-          scheduleModal.classList.remove("active");
-          await updateSchedule();
-        } else {
-          alert("❌ Ошибка: " + (result.error || "Не удалось сохранить"));
+            const result = await res.json();
+
+            if (result.success) {
+                alert(isEditMode ? "✅ Изменения сохранены!" : "✅ Занятие добавлено!");
+                closeModal();
+                await updateSchedule();
+            } else {
+                alert("❌ Ошибка: " + (result.error || "Не удалось сохранить"));
+            }
+        } catch (err) {
+            alert("❌ Сетевая ошибка: " + err.message);
+        } finally {
+            saveBtn.disabled = false;
+            saveBtn.textContent = isEditMode ? "Сохранить изменения" : "Сохранить";
+        }
+    });
+
+    deleteBtn.addEventListener("click", async () => {
+        if (!currentLessonId) {
+            alert("Ошибка: нет ID занятия");
+            return;
         }
 
-      } catch (err) {
-        alert("❌ Сетевая ошибка: " + err.message);
-      } finally {
-        saveBtn.disabled = false;
-        saveBtn.textContent = isEditMode ? "Сохранить изменения" : "Сохранить";
-        isEditMode = false;
-        currentLessonId = null;
-      }
+        if (!confirm("Удалить это занятие?")) return;
+
+        deleteBtn.disabled = true;
+        deleteBtn.textContent = "Удаляем...";
+
+        try {
+            const res = await fetch(`/delete-schedule/${currentLessonId}/`, {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": getCSRFToken()
+                }
+            });
+
+            const result = await res.json();
+
+            if (result.success) {
+                alert("🗑️ Занятие удалено!");
+                closeModal();
+                await updateSchedule();
+            } else {
+                alert("❌ Ошибка: " + (result.error || "Не удалось удалить"));
+            }
+        } catch (err) {
+            alert("❌ Сетевая ошибка: " + err.message);
+        } finally {
+            deleteBtn.disabled = false;
+            deleteBtn.textContent = "Удалить";
+        }
     });
-  }
 
-  const deleteBtn = document.getElementById("delete-schedule");
+    document.getElementById("refresh-btn").addEventListener("click", () => {
+        location.reload();
+    });
 
-  async function deleteSchedule() {
-    if (!currentLessonId) return alert("Ошибка: нет ID!");
+    await updateGroupOptions(true);
 
-    if (!confirm("❗ Вы уверены, что хотите удалить это занятие?")) return;
-
-    deleteBtn.disabled = true;
-    deleteBtn.textContent = "Удаляем...";
-
-    try {
-      const res = await fetch(`/delete-schedule/${currentLessonId}/`, {
-        method: "POST",
-        headers: { "X-CSRFToken": getCSRFToken() }
-      });
-
-      const result = await res.json();
-
-      if (result.success) {
-        alert("🗑️ Занятие удалено!");
-        scheduleModal.classList.remove("active");
-        await updateSchedule();
-      } else {
-        alert("❌ Ошибка: " + (result.error || "Не удалось удалить"));
-      }
-
-    } catch (err) {
-      alert("❌ Сетевая ошибка: " + err.message);
-    } finally {
-      deleteBtn.disabled = false;
-      deleteBtn.textContent = "Удалить";
+    if (groupSelect.value) {
+        updateSchedule();
     }
-  }
-
-  if (deleteBtn) deleteBtn.addEventListener("click", deleteSchedule);
-
+    
 });
-</script>
-
-
-<script>
-document.getElementById("refresh-btn")?.addEventListener("click", () => {
-    location.reload();
-});
-</script>
-
-
-
-
-
-
-
-
-
+</script>   
 {% endblock %}
+

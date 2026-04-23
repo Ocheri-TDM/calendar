@@ -1,0 +1,29 @@
+{% for weekday in "12345"|make_list %}
+    <ul class="schedule-col" data-weekday="{{ weekday }}">
+        <li class="class-slot practice-slot">
+            <div class="class-card practice-card">
+                <div class="practice-badge">
+                    <i class="fas fa-briefcase"></i>
+                    Практика
+                </div>
+
+                <div class="practice-title">
+                    {{ current_state.practice_name|default:"Практика" }}
+                </div>
+
+                <div class="practice-info">
+                    На этой неделе у группы идет практика вместо обычного расписания.
+                </div>
+
+                <div class="practice-time">
+                    <span class="fa-icon"><i class="fas fa-clock"></i></span>
+                    {% if group.shift == 2 %}
+                        13:00 – 17:20 (3 пары)
+                    {% else %}
+                        08:00 – 12:20 (3 пары)
+                    {% endif %}
+                </div>
+            </div>
+        </li>
+    </ul>
+{% endfor %}

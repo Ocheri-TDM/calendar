@@ -398,6 +398,84 @@ font-size: 0.85rem;
            
         }
 
+        .practice-slot {
+    min-height: 220px;
+}
+
+.practice-card {
+    min-height: 220px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    border: 2px solid rgba(14, 124, 102, 0.18);
+    background:
+        linear-gradient(135deg, rgba(58, 183, 149, 0.12), rgba(14, 124, 102, 0.06)),
+        #ffffff;
+    position: relative;
+    overflow: hidden;
+}
+
+.practice-card::before {
+    content: "";
+    position: absolute;
+    top: -30px;
+    right: -30px;
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    background: rgba(58, 183, 149, 0.10);
+}
+
+.practice-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    width: fit-content;
+    padding: 0.4rem 0.9rem;
+    border-radius: 999px;
+    background: linear-gradient(45deg, #3AB795, #0E7C66);
+    color: white;
+    font-size: 0.85rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.practice-title {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #0E7C66;
+    margin-bottom: 0.8rem;
+    line-height: 1.35;
+}
+
+.practice-group {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--dark-blue);
+    margin-bottom: 0.8rem;
+}
+
+.practice-info {
+    color: #555;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin-bottom: auto;
+}
+
+.practice-time {
+    margin-top: 1rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #0E7C66;
+    background: rgba(58, 183, 149, 0.10);
+    border-radius: 10px;
+    padding: 0.7rem 0.9rem;
+    width: fit-content;
+}
+
         /* @media (max-width: 900px) {
             .schedule-body {
                 flex-wrap: wrap;

@@ -426,7 +426,6 @@
             color: var(--alert);
             border: 1px solid rgba(231, 76, 60, 0.3);
         }
-        
         .delete-btn:hover {
             background: rgba(231, 76, 60, 0.15);
         }
