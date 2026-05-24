@@ -23,6 +23,7 @@ from .models import (
     ClassSchedule,
     GroupWeekState,
     DirectionDiscipline,
+    GroupPracticeClassroom,
 )
 
 
@@ -985,7 +986,7 @@ def delete_teacher(request, teacher_id):
 # =========================================================
 # USER SIDE
 # =========================================================
-def main(request):
+def main(request, any_path=None):
     groups = Group.objects.select_related("direction").all().order_by("course", "name_group")
 
     selected_group_id = request.GET.get("group")
@@ -1001,7 +1002,7 @@ def main(request):
             if current_state and current_state.state == "theory":
                 week_type = get_week_type()
                 schedules = (
-                    ClassSchedule.objects.select_related("discipline", "teacher", "classroom", "group")
+                    ClassSchedule.objects.select_related("discipline", "teacher", "classroom", "classroom2","group")
                     .filter(group=selected_group, week_type=week_type)
                     .order_by("weekday", "lesson_number")
                 )
@@ -1070,6 +1071,29 @@ def get_schedule(request):
             "html": html,
         })
 
+    practice_classroom = None
+
+    if current_state.practice_code == "УП":
+        practice_classroom = (
+            GroupPracticeClassroom.objects
+            .select_related("classroom")
+            .filter(
+                group=group,
+                week_number=current_state.week_number
+            )
+            .first()
+        )
+
+    html = render_to_string(
+        "dinamic-user/user-schedule-practice.html",
+        {
+            "group": group,
+            "current_state": current_state,
+            "practice_classroom": practice_classroom,
+        },
+        request=request
+    )
+
     if current_state.state in {"vacation", "holiday", "no_schedule"}:
         html = render_to_string(
             "dinamic-user/user-schedule-empty.html",
@@ -1088,7 +1112,7 @@ def get_schedule(request):
         })
 
     schedule = (
-        ClassSchedule.objects.select_related("discipline", "teacher", "classroom", "group")
+        ClassSchedule.objects.select_related("discipline", "teacher", "classroom", "classroom2","group")
         .filter(group_id=group_id, week_type=week_type)
         .order_by("weekday", "lesson_number")
     )
@@ -1141,3 +1165,109 @@ def api_groups_full(request):
     return JsonResponse({
         "groups": [serialize_group(group) for group in groups]
     })
+
+
+
+
+
+# -------------------------------
+# TEACHER SIDE BAR
+# -------------------------------
+
+
+
+def get_teacher_full_name(teacher):
+    return f"{teacher.last_name} {teacher.first_name} {teacher.patronymic or ''}".strip()
+
+
+def teacher(request):
+    all_teachers = Teacher.objects.all().order_by("last_name", "first_name", "patronymic")
+
+    unique = {}
+    for t in all_teachers:
+        name = get_teacher_full_name(t)
+        if name not in unique:
+            unique[name] = t
+
+    teachers = list(unique.values())
+
+    return render(request, "teacher/teacher.html", {
+        "teachers": teachers,
+        "selected_week_type": request.GET.get("week_type") or get_week_type(),
+    })
+
+
+def get_teacher_schedule(request):
+    teacher_id = request.GET.get("teacher_id")
+    week_type = request.GET.get("week_type") or get_week_type()
+
+    if not teacher_id:
+        return JsonResponse({"success": False, "error": "Не выбран преподаватель"}, status=400)
+
+    teacher_obj = Teacher.objects.filter(id=teacher_id).first()
+
+    if not teacher_obj:
+        return JsonResponse({"success": False, "error": "Преподаватель не найден"}, status=404)
+
+    teacher_name = get_teacher_full_name(teacher_obj)
+
+    same_teachers = Teacher.objects.filter(
+        last_name=teacher_obj.last_name,
+        first_name=teacher_obj.first_name,
+        patronymic=teacher_obj.patronymic
+    )
+
+    teacher_ids = same_teachers.values_list("id", flat=True)
+
+    schedule = {
+        "1": {str(day): {str(pair): [] for pair in range(1, 5)} for day in range(1, 7)},
+        "2": {str(day): {str(pair): [] for pair in range(1, 5)} for day in range(1, 7)},
+    }
+
+    lessons = (
+        ClassSchedule.objects
+        .select_related("discipline", "group", "classroom", "teacher")
+        .filter(teacher_id__in=teacher_ids, week_type=week_type)
+        .order_by("group__shift", "weekday", "lesson_number", "group__name_group")
+    )
+
+    for lesson in lessons:
+        if not lesson.group:
+            continue
+
+        shift = str(lesson.group.shift)
+        weekday = str(lesson.weekday)
+        pair = str(lesson.lesson_number)
+
+        if shift not in schedule:
+            continue
+
+        if weekday not in schedule[shift]:
+            continue
+
+        if pair not in schedule[shift][weekday]:
+            continue
+
+        schedule[shift][weekday][pair].append({
+            "id": lesson.id,
+            "discipline": lesson.discipline.name_dis if lesson.discipline else "Без предмета",
+            "group": lesson.group.name_group if lesson.group else "Без группы",
+            "room": lesson.classroom.number_room if lesson.classroom else "—",
+            "weekday": lesson.weekday,
+            "lesson_number": lesson.lesson_number,
+            "shift": lesson.group.shift,
+        })
+
+    return JsonResponse({
+        "success": True,
+        "teacher": {
+            "id": teacher_obj.id,
+            "name": teacher_name,
+        },
+        "week_type": week_type,
+        "schedule": schedule,
+    })
+
+
+def main2(request ):
+    return render(request, "main/main.html")

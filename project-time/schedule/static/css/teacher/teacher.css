@@ -1,0 +1,296 @@
+:root {
+    --primary-blue: #4361ee;
+    --dark-blue: #3a0ca3;
+    --light-blue: #e2e6ff;
+    --accent-blue: #260355;
+    --light-gray: #f7f9fc;
+    --text-dark: #333;
+    --teacher-border: #dee2f4;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+body {
+    background: linear-gradient(135deg, #f5f7ff, #eef2ff);
+    color: var(--text-dark);
+    min-height: 100vh;
+}
+
+.teacher-page {
+    width: 100%;
+    min-height: 100vh;
+    padding: 2rem;
+    background: linear-gradient(135deg, #f5f7ff, #eef2ff);
+}
+
+.teacher-toolbar {
+    max-width: 1440px;
+    margin: 0 auto 1.8rem auto;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 15px 40px rgba(59, 11, 163, 0.12);
+    padding: 1.6rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+
+.teacher-title {
+    color: var(--dark-blue);
+    font-size: 2.2rem;
+    font-weight: 700;
+}
+
+.teacher-subtitle {
+    margin-top: 0.4rem;
+    color: #777;
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+.teacher-filters {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.teacher-select {
+    width: 260px;
+    padding: 0.8rem 1rem;
+    border-radius: 12px;
+    border: 2px solid var(--teacher-border);
+    background: white;
+    font-size: 1rem;
+    color: var(--dark-blue);
+    transition: all 0.25s ease;
+    cursor: pointer;
+    outline: none;
+    appearance: none;
+}
+
+.teacher-select:focus {
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.2);
+}
+
+#scheduleArea {
+    max-width: 1440px;
+    margin: 0 auto;
+}
+
+.shift-block {
+    width: 100%;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 15px 40px rgba(59, 11, 163, 0.12);
+    padding: 1.6rem 2rem;
+    margin-bottom: 1.8rem;
+    overflow: hidden;
+}
+
+.shift-title {
+    color: var(--dark-blue);
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1.2rem;
+}
+
+.teacher-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    padding-bottom: 8px;
+}
+
+.teacher-table-wrapper::-webkit-scrollbar {
+    height: 10px;
+    background: var(--light-blue);
+    border-radius: 10px;
+}
+
+.teacher-table-wrapper::-webkit-scrollbar-thumb {
+    background: linear-gradient(45deg, var(--primary-blue), var(--dark-blue));
+    border-radius: 10px;
+}
+
+.teacher-table-wrapper::-webkit-scrollbar-thumb:hover {
+    background: var(--dark-blue);
+    cursor: grab;
+}
+
+.teacher-schedule {
+    width: max-content;
+    min-width: 100%;
+    border-collapse: separate;
+    border-spacing: 10px;
+    table-layout: fixed;
+}
+
+.teacher-schedule th {
+    width: 190px;
+    min-width: 190px;
+    background: var(--primary-blue);
+    color: white;
+    padding: 1rem;
+    border-radius: 15px;
+    text-align: center;
+    font-size: 1rem;
+    font-weight: 700;
+    box-shadow: 0 4px 12px rgba(0, 0, 30, 0.05);
+}
+
+.teacher-schedule th:first-child {
+    width: 140px;
+    min-width: 140px;
+    background: var(--dark-blue);
+}
+
+.teacher-schedule th small {
+    display: block;
+    margin-top: 0.4rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+    opacity: 0.9;
+}
+
+.teacher-schedule td {
+    width: 190px;
+    min-width: 190px;
+    min-height: 130px;
+    padding: 0.8rem;
+    background: #fafcff;
+    border: 2px solid transparent;
+    border-radius: 15px;
+    vertical-align: top;
+    transition: all 0.3s ease;
+}
+
+.teacher-schedule td:hover {
+    background: white;
+    border-color: rgba(67, 97, 238, 0.3);
+    box-shadow: 0 12px 25px rgba(67, 97, 238, 0.15);
+}
+
+.lesson-card {
+    width: 100%;
+    background: white;
+    border-radius: 15px;
+    padding: 1rem;
+    border-left: 5px solid var(--primary-blue);
+    box-shadow: 0 5px 15px rgba(0, 0, 30, 0.05);
+    transition: all 0.3s ease;
+    overflow-wrap: break-word;
+    word-break: break-word;
+}
+
+.lesson-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 25px rgba(67, 97, 238, 0.15);
+}
+
+.lesson-card + .lesson-card {
+    margin-top: 0.8rem;
+}
+
+.lesson-name {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--dark-blue);
+    margin-bottom: 0.7rem;
+    line-height: 1.3;
+}
+
+.lesson-info {
+    font-size: 0.9rem;
+    color: #555;
+    margin-top: 0.45rem;
+    line-height: 1.35;
+    font-weight: 500;
+}
+
+.empty-lesson {
+    color: #8792a7;
+    text-align: center;
+    font-style: normal;
+    font-size: 0.95rem;
+    font-weight: 500;
+    vertical-align: middle !important;
+    background: #fafcff !important;
+    border: 2px dashed #dee2f4 !important;
+}
+
+.loading-box,
+.error-box,
+.empty-global {
+    background: white;
+    border-radius: 20px;
+    padding: 1.6rem 2rem;
+    color: #777;
+    box-shadow: 0 15px 40px rgba(59, 11, 163, 0.12);
+    font-weight: 600;
+}
+
+.error-box {
+    color: #dc2626;
+    background: #fef2f2;
+    border: 2px solid #fecaca;
+}
+
+@media (max-width: 850px) {
+    body {
+        padding: 0;
+    }
+
+    .teacher-page {
+        padding: 0;
+        background: var(--accent-blue);
+    }
+
+    .teacher-toolbar {
+        border-radius: 0;
+        margin-bottom: 0;
+        background: var(--accent-blue);
+        box-shadow: none;
+        padding: 1.6rem 1.2rem;
+    }
+
+    .teacher-title {
+        font-size: 28px;
+        color: var(--light-gray);
+    }
+
+    .teacher-subtitle {
+        color: #dbeafe;
+    }
+
+    .teacher-filters {
+        width: 100%;
+        flex-direction: column;
+    }
+
+    .teacher-select {
+        width: 100%;
+    }
+
+    #scheduleArea {
+        padding: 0 1.2rem 1.6rem;
+    }
+
+    .shift-block {
+        padding: 1.4rem;
+        border-radius: 15px;
+    }
+
+    .teacher-schedule th,
+    .teacher-schedule td {
+        width: 170px;
+        min-width: 170px;
+    }
+}

@@ -11,9 +11,12 @@
                     {{ current_state.practice_name|default:"Практика" }}
                 </div>
 
-                <div class="practice-info">
-                    На этой неделе у группы идет практика вместо обычного расписания.
-                </div>
+                {% if practice_classroom and practice_classroom.classroom %}
+                    <div class="practice-time">
+                        <span class="fa-icon"><i class="fas fa-door-open"></i></span>
+                        Кабинет: {{ practice_classroom.classroom.number_room }}
+                    </div>
+                {% endif %}
 
                 <div class="practice-time">
                     <span class="fa-icon"><i class="fas fa-clock"></i></span>

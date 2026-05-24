@@ -231,6 +231,15 @@ class ClassSchedule(models.Model):
         verbose_name="Аудитория",
         db_column="classroom_id",
     )
+    classroom2 = models.ForeignKey(
+    Classroom,
+    on_delete=models.SET_NULL,
+    null=True,
+    blank=True,
+    verbose_name="Вторая аудитория",
+    db_column="second_classroom_id",
+    related_name="second_classroom_id",
+)
 
     weekday = models.PositiveSmallIntegerField(choices=WEEKDAY_CHOICES, verbose_name="День недели")
     week_type = models.CharField(max_length=20, choices=WEEK_TYPE_CHOICES, default="numerator", verbose_name="Тип недели")
@@ -287,3 +296,31 @@ class DirectionDiscipline(models.Model):
         verbose_name = "Связь направления и дисциплины"
         verbose_name_plural = "Связи направлений и дисциплин"
         unique_together = ("direction", "discipline", "course")
+    
+
+
+
+class GroupPracticeClassroom(models.Model):
+    group = models.ForeignKey(
+        Group,
+        on_delete=models.CASCADE,
+        related_name="practice_classrooms"
+    )
+    week_number = models.IntegerField()
+    practice_code = models.CharField(max_length=50)
+    classroom = models.ForeignKey(
+        Classroom,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
+    start_date = models.DateField(null=True, blank=True)
+    end_date = models.DateField(null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = "main_group_practice_classroom"
+        unique_together = ("group", "week_number", "practice_code")
+
+    def __str__(self):
+        return f"{self.group} - {self.practice_code} - {self.week_number}"

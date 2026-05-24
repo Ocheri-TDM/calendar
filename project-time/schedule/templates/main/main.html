@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>INTC Portal</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:'Inter',sans-serif;
+    background:#050816;
+    color:white;
+    overflow-x:hidden;
+}
+
+body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    background:
+    radial-gradient(circle at top left,#1e40af55,transparent 30%),
+    radial-gradient(circle at bottom right,#2563eb33,transparent 30%);
+    z-index:-1;
+}
+
+header{
+    width:100%;
+    height:90px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:0 80px;
+    border-bottom:1px solid rgba(255,255,255,0.08);
+    backdrop-filter:blur(14px);
+    position:sticky;
+    top:0;
+    background:rgba(5,8,22,0.75);
+    z-index:100;
+}
+
+.logo{
+    font-size:28px;
+    font-weight:800;
+    letter-spacing:2px;
+    color:#60a5fa;
+}
+
+nav{
+    display:flex;
+    gap:40px;
+}
+
+nav a{
+    text-decoration:none;
+    color:#dbeafe;
+    transition:0.3s;
+    font-weight:500;
+}
+
+nav a:hover{
+    color:white;
+}
+
+.hero{
+    min-height:calc(100vh - 90px);
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    text-align:center;
+    padding:80px 20px;
+}
+
+.hero h1{
+    font-size:72px;
+    max-width:1000px;
+    line-height:1.1;
+    margin-bottom:25px;
+    font-weight:800;
+}
+
+.hero p{
+    max-width:850px;
+    color:#94a3b8;
+    font-size:20px;
+    line-height:1.7;
+    margin-bottom:70px;
+}
+
+.cards{
+    width:100%;
+    max-width:1200px;
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+    gap:35px;
+}
+
+.card-link{
+    text-decoration:none;
+    color:white;
+    padding:45px;
+    border-radius:30px;
+    background:rgba(255,255,255,0.05);
+    border:1px solid rgba(255,255,255,0.08);
+    backdrop-filter:blur(20px);
+    transition:0.4s;
+    position:relative;
+    overflow:hidden;
+}
+
+.card-link::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:linear-gradient(135deg,#2563eb22,#3b82f622);
+    opacity:0;
+    transition:0.4s;
+}
+
+.card-link:hover::before{
+    opacity:1;
+}
+
+.card-link:hover{
+    transform:translateY(-10px);
+    border-color:#3b82f6;
+    box-shadow:0 20px 60px rgba(37,99,235,0.3);
+}
+
+.card-link h2{
+    font-size:32px;
+    margin-bottom:20px;
+    position:relative;
+    z-index:2;
+}
+
+.card-link p{
+    color:#cbd5e1;
+    line-height:1.7;
+    position:relative;
+    z-index:2;
+}
+
+footer{
+    width:100%;
+    padding:50px 80px;
+    border-top:1px solid rgba(255,255,255,0.08);
+    margin-top:100px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:20px;
+}
+
+.footer-left h3{
+    color:#60a5fa;
+    margin-bottom:10px;
+}
+
+.footer-left p{
+    color:#94a3b8;
+}
+
+.footer-right{
+    color:#64748b;
+}
+
+@media(max-width:768px){
+
+    header{
+        padding:0 25px;
+    }
+
+    nav{
+        gap:20px;
+    }
+
+    .hero h1{
+        font-size:42px;
+    }
+
+    .hero p{
+        font-size:16px;
+    }
+
+    footer{
+        padding:40px 25px;
+        flex-direction:column;
+        align-items:flex-start;
+    }
+
+}
+
+</style>
+</head>
+<body>
+
+<header>
+
+    <div class="logo">INTC</div>
+
+</header>
+
+<section class="hero">
+
+    <h1>Инновационная IT-платформа колледжа нового поколения</h1>
+
+    <p>
+        Современная цифровая среда для студентов и преподавателей.
+        Быстрый доступ к образовательным сервисам, расписанию,
+        внутренним системам и IT-проектам колледжа.
+    </p>
+
+    <div class="cards">
+
+        <a href="{% url 'student' %}" class="card-link">
+            <h2>Студентам</h2>
+            <p>
+                Расписание, учебные материалы, задания,
+                академический календарь и внутренняя система обучения.
+            </p>
+        </a>
+
+        <a href="{% url 'teacher' %}" class="card-link">
+            <h2>Преподавателям</h2>
+            <p>
+                Управление группами, расписанием,
+                образовательными программами и учебным процессом.
+            </p>
+        </a>
+
+    </div>
+
+</section>
+
+<footer>
+
+    <div class="footer-left">
+        <h3>INTC</h3>
+        <p>Инновационный Технический Колледж</p>
+    </div>
+
+    <div class="footer-right">
+        © 2026 INTC • All Rights Reserved
+    </div>
+
+</footer>
+
+</body>
+</html>

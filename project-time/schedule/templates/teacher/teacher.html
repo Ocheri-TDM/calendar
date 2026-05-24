@@ -1,0 +1,174 @@
+<title>Расписание преподавателя</title>
+{% load static %}
+
+
+{% block content %}
+<!-- <link rel="stylesheet" href="{% static 'css/admin/admin-schedule.css' %}"> -->
+<link rel="stylesheet" href="{% static 'css/teacher/teacher.css' %}">
+
+<div class="teacher-page">
+    <div class="teacher-toolbar">
+        <div>
+            <div class="teacher-title">Расписание преподавателя</div>
+            <div class="teacher-subtitle">Показываются 1 и 2 смена</div>
+        </div>
+
+        <div class="teacher-filters">
+            <select id="teacherSelect" class="teacher-select">
+                {% for teacher in teachers %}
+                    <option value="{{ teacher.id }}">
+                        {{ teacher.last_name }} {{ teacher.first_name }} {{ teacher.patronymic|default:"" }}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <select id="weekTypeSelect" class="teacher-select">
+                <option value="numerator" {% if selected_week_type == "numerator" %}selected{% endif %}>
+                    Числитель
+                </option>
+                <option value="denominator" {% if selected_week_type == "denominator" %}selected{% endif %}>
+                    Знаменатель
+                </option>
+            </select>
+        </div>
+    </div>
+
+    <div id="scheduleArea"></div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const teacherSelect = document.getElementById("teacherSelect");
+    const weekTypeSelect = document.getElementById("weekTypeSelect");
+    const scheduleArea = document.getElementById("scheduleArea");
+
+    const days = {
+        1: "Понедельник",
+        2: "Вторник",
+        3: "Среда",
+        4: "Четверг",
+        5: "Пятница",
+    };
+
+    const shifts = {
+        1: {
+            title: "1 смена",
+            times: {
+                1: "08:00 - 09:20",
+                2: "09:30 - 10:50",
+                3: "11:00 - 12:20",
+                4: "12:30 - 13:50"
+            }
+        },
+        2: {
+            title: "2 смена",
+            times: {
+                1: "13:00 - 14:20",
+                2: "14:30 - 15:50",
+                3: "16:00 - 17:20",
+                4: "17:30 - 18:50"
+            }
+        }
+    };
+
+    async function loadSchedule() {
+        const teacherId = teacherSelect.value;
+        const weekType = weekTypeSelect.value;
+
+        if (!teacherId) {
+            scheduleArea.innerHTML = `<div class="empty-global">Нет преподавателей</div>`;
+            return;
+        }
+
+        scheduleArea.innerHTML = `<div class="loading-box">Загрузка расписания...</div>`;
+
+        const url = `{% url 'get-teacher-schedule' %}?teacher_id=${teacherId}&week_type=${weekType}`;
+
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (!data.success) {
+            scheduleArea.innerHTML = `<div class="error-box">${data.error}</div>`;
+            return;
+        }
+
+        renderSchedule(data.schedule);
+    }
+
+    function renderSchedule(schedule) {
+        scheduleArea.innerHTML = "";
+
+        Object.keys(shifts).forEach(shiftKey => {
+            const shift = shifts[shiftKey];
+
+            let html = `
+                <div class="shift-block">
+                    <div class="shift-title">${shift.title}</div>
+
+                    <div class="teacher-table-wrapper">
+                        <table class="teacher-schedule">
+                            <thead>
+                                <tr>
+                                    <th>Пара</th>
+                                    ${Object.values(days).map(day => `<th>${day}</th>`).join("")}
+                                </tr>
+                            </thead>
+                            <tbody>
+            `;
+
+            for (let pair = 1; pair <= 4; pair++) {
+                html += `
+                    <tr>
+                        <th>
+                            <div>${pair} пара</div>
+                            <small>${shift.times[pair]}</small>
+                        </th>
+                `;
+
+                Object.keys(days).forEach(dayKey => {
+                    const lessons = schedule[shiftKey][dayKey][pair];
+
+                    if (lessons && lessons.length > 0) {
+                        html += `<td>`;
+
+                        lessons.forEach(lesson => {
+                            html += `
+                                <div class="lesson-card">
+                                    <div class="lesson-name">${lesson.discipline}</div>
+                                    <div class="lesson-info">Группа: ${lesson.group}</div>
+                                    <div class="lesson-info">Кабинет: ${lesson.room}</div>
+                                </div>
+                            `;
+                        });
+
+                        html += `</td>`;
+                    } else {
+                        html += `
+                            <td class="empty-lesson">
+                                Нет занятия
+                            </td>
+                        `;
+                    }
+                });
+
+                html += `</tr>`;
+            }
+
+            html += `
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+
+            scheduleArea.insertAdjacentHTML("beforeend", html);
+        });
+    }
+
+    teacherSelect.addEventListener("change", loadSchedule);
+    weekTypeSelect.addEventListener("change", loadSchedule);
+
+    loadSchedule();
+});
+</script>
+{% endblock %}

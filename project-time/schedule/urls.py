@@ -31,10 +31,18 @@ urlpatterns = [
     path("admin-group", views.admin_group, name="admin-group"),
 
     # user view
-    path("", views.main, name="main"),
+    path("/student", views.main, name="student"),
     path("api/schedule/", views.get_schedule, name="api_schedule"),
 
     # new user api
     path("api/group-state/<int:group_id>/", views.api_group_state, name="api_group_state"),
     path("api/groups-full/", views.api_groups_full, name="api_groups_full"),
+
+    # teacher view
+    path("teacher/", views.teacher, name="teacher"),
+    path("teacher/api/schedule/", views.get_teacher_schedule, name="get-teacher-schedule"),
+
+
+    path("", views.main2, name="main"),
+    path("<path:any_path>/", views.main),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
