@@ -1269,5 +1269,5 @@ def get_teacher_schedule(request):
     })
 
 
-def main2(request ):
+def main2(request, any_path=None):
     return render(request, "main/main.html")

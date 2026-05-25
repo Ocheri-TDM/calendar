@@ -1,11 +1,13 @@
 from django.urls import path
 from . import views
 from django.conf import settings
+from django.shortcuts import redirect
 from django.conf.urls.static import static
 
 urlpatterns = [
+    path("admin/", lambda request: redirect("admin-schedule")),
     # views for admin
-    path("admin-schedule", views.admin_schedule, name="admin-schedule"),
+    path("admin-schedule/", views.admin_schedule, name="admin-schedule"),
     path("search-discipline/", views.search_discipline, name="search_discipline"),
     path("get-discipline-details/<int:discipline_id>/", views.get_discipline_details, name="get_discipline_details"),
     path("api/groups/", views.get_groups_by_shift, name="api_groups_by_shift"),
@@ -31,7 +33,7 @@ urlpatterns = [
     path("admin-group", views.admin_group, name="admin-group"),
 
     # user view
-    path("/student", views.main, name="student"),
+    path("student/", views.main, name="student"),
     path("api/schedule/", views.get_schedule, name="api_schedule"),
 
     # new user api
@@ -44,5 +46,5 @@ urlpatterns = [
 
 
     path("", views.main2, name="main"),
-    path("<path:any_path>/", views.main),
+    path("<path:any_path>/", views.main2),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -79,11 +79,11 @@ from pathlib import Path
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'schedule_db',
+        'NAME': 'railway',
         'USER': 'root',
-        'PASSWORD': '',
-        'HOST': '127.0.0.1',
-        'PORT': '3306',
+        'PASSWORD': 'wkWULjEDgVViIeroxhyLPZWUdIyBSjMn',
+        'HOST': 'turntable.proxy.rlwy.net',
+        'PORT': '20594',
         'OPTIONS': {
             'charset': 'utf8mb4',
         },

@@ -8,6 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="filename" content="class-schedule.html">
     <link rel="stylesheet" href="{% static 'css/users/user-schedule.css' %}">
+    <link rel="icon" href="{% static 'img/favicon2.ico' %}" type="image/x-icon">
     <title>Расписание занятий</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -83,6 +84,17 @@
                 </div>
             </div>
             
+            <div id="schedule-skeleton" class="schedule-skeleton" style="display:none;">
+                {% for i in "12345" %}
+                <div class="skeleton-col">
+                    <div class="skeleton-card"></div>
+                    <div class="skeleton-card"></div>
+                    <div class="skeleton-card"></div>
+                    <div class="skeleton-card"></div>
+                </div>
+                {% endfor %}
+            </div>
+
             <div id="schedule-wrapper" class="schedule-body" style="display:none;">
                 {% include 'dinamic-user/user-schedule-main.html' %}
             </div>
@@ -101,6 +113,7 @@
 <script>
 document.addEventListener("DOMContentLoaded", () => {
     const scheduleContainer = document.getElementById("schedule-wrapper");
+    const scheduleSkeleton = document.getElementById("schedule-skeleton");
     const shiftSelect = document.getElementById("shift-select");
     const groupSelect = document.getElementById("group-select");
     const weekSelect = document.getElementById("week-select");
@@ -111,6 +124,16 @@ document.addEventListener("DOMContentLoaded", () => {
         1: ["08:30 - 09:50", "10:00 - 11:20", "11:30 - 12:50", "13:00 - 14:20"],
         2: ["13:30 - 14:50", "15:00 - 16:20", "16:30 - 17:50", "18:00 - 19:20"]
     };
+
+    function showSkeleton() {
+        scheduleContainer.style.display = "none";
+        scheduleContainer.innerHTML = "";
+        scheduleSkeleton.style.display = "flex";
+    }
+
+    function hideSkeleton() {
+        scheduleSkeleton.style.display = "none";
+    }
 
     function getWeekValue(raw) {
         return raw === "Числитель" ? "numerator" : "denominator";
@@ -207,14 +230,19 @@ document.addEventListener("DOMContentLoaded", () => {
         const week = getWeekValue(weekSelect.value);
 
         if (!groupId) {
+            hideSkeleton();
             scheduleContainer.style.display = "none";
             scheduleContainer.innerHTML = "";
             return;
         }
 
+        showSkeleton();
+
         try {
             const response = await fetch(`/api/schedule/?group_id=${groupId}&week_type=${week}`);
             const data = await response.json();
+
+            hideSkeleton();
 
             scheduleContainer.innerHTML = data.html || "";
             scheduleContainer.style.display = "flex";
@@ -223,20 +251,14 @@ document.addEventListener("DOMContentLoaded", () => {
                 applyShiftTimes();
                 highlightCurrentClass();
             }
-
-            if (data.mode === "practice") {
-                // Для практики отдельная заглушка, обычные пары не трогаем
-            }
-
-            if (data.mode === "empty") {
-                // Для пустого состояния просто показываем то, что вернул backend
-            }
         } catch (err) {
+            hideSkeleton();
             console.error("Ошибка загрузки расписания:", err);
             scheduleContainer.style.display = "none";
         }
     }
 
+    
     function initDayHeaders() {
         const today = new Date();
         const todayWeekday = today.getDay(); // 0 = воскресенье
